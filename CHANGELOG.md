@@ -5,6 +5,10 @@ Spec, schema and validator versions. Dates are UTC.
 ## Unreleased
 
 - Pending: Frost Gate Traverse added to `tests/0.1/valid/`.
+- Spec 0.1 re-converted from doc rev 58: bend window clamped at the ends of an open course and wrapping on a loop, S-bends split where the direction changes, rule 9 windows defined, headings that round to 360° stored as 0, no finish marker on a closed course, `widthSource` `"design"`, drafts may change until released.
+- Schema 0.1: `widthSource` accepts `"design"`.
+- Validator: error for a finish marker on a closed course (code `spec`); measured apex as 5.4 defines it; bend completeness skipped above 10 000 km.
+- Tests: valid S-bend and bend-at-start courses; invalid heading of 3600 (rule 5) and finish on a loop.
 
 ## Draft 0.1 — 2026-10-30
 

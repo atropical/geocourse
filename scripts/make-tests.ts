@@ -91,10 +91,65 @@ function stadium(): Json {
   };
 }
 
+/** An open local-frame course from straights and arcs: [length] or [length, radius, "left" | "right"]. */
+function pieces(id: string, name: string, description: string, parts: [number, number?, ("left" | "right")?][], bends: Json[]): Json {
+  const length = parts.reduce((s, p) => s + p[0], 0);
+  const at = (d: number): [number, number] => {
+    let x = 0, y = 0, h = Math.PI / 2; // heading east, as a compass angle
+    for (const [len, R, dir] of parts) {
+      const t = Math.min(d, len);
+      if (!R) { x += t * Math.sin(h); y += t * Math.cos(h); }
+      else {
+        const s = dir === "right" ? 1 : -1, a = (s * t) / R;
+        x += s * R * (Math.cos(h) - Math.cos(h + a));
+        y += s * R * (Math.sin(h + a) - Math.sin(h));
+        h += a;
+      }
+      d -= t;
+      if (d <= 0) break;
+    }
+    return [x, y];
+  };
+  const n = Math.ceil(length) + 1;
+  const positions: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const [x, y] = at(Math.min(i, length));
+    positions.push(Math.round(x * 100), Math.round(y * 100));
+  }
+  return {
+    $schema: "https://geocourse.org/schema/0.1/geocourse.schema.json",
+    type: "Course", format: "0.1", id, version: 1, name, description, length, closed: false, licence: "CC0-1.0",
+    geometry: { frame: "local", step: 1, scale: 0.01, positions },
+    profile: { step: 10, elevation: { scale: 0.1, values: new Array(Math.ceil(length / 10) + 1).fill(500) }, bendRadiusLimit: 400 },
+    ranges: [
+      { type: "marker", from: 0, to: 0, properties: { kind: "start" } },
+      { type: "road", from: 0, to: length, properties: { highway: "cycleway", width: 3, widthSource: "design" } },
+      { type: "surface", from: 0, to: length, properties: { crr: 0.004, grip: 0.8, surface: "asphalt" } },
+      ...bends,
+      { type: "marker", from: length, to: length, properties: { kind: "finish" } },
+    ],
+  };
+}
+
+const r2 = (x: number) => Math.round(x * 100) / 100;
+const q = (R: number) => (Math.PI * R) / 2; // quarter-circle arc length
+// Left 90° bend straight into a right 90° bend, radius 30 m, no straight between.
+const sBend = pieces("test-s-bend", "S-bend", "Test course: a 30 m left bend straight into a 30 m right bend, split where the turn changes direction.",
+  [[100], [q(30), 30, "left"], [q(30), 30, "right"], [100]],
+  [
+    { type: "bend", from: 90, to: r2(100 + q(30)), properties: { radius: 30, direction: "left", apex: r2(100 + q(30) / 2) } },
+    { type: "bend", from: r2(100 + q(30)), to: r2(110 + 2 * q(30)), properties: { radius: 30, direction: "right", apex: r2(100 + 1.5 * q(30)) } },
+  ]);
+// Starts on a 30 m right bend, so the window is clamped at d = 0.
+const clamped = pieces("test-bend-at-start", "Bend at the start", "Test course: starts on a 30 m right bend, measured with the window clamped at the start.",
+  [[q(30), 30, "right"], [100]],
+  [{ type: "bend", from: 0, to: r2(q(30) + 10), properties: { radius: 30, direction: "right", apex: r2(q(30) / 2) } }]);
+
 interface Case {
   file: string;
   valid: boolean;
   rule?: number;
+  /** Defaults to R<rule>. */
   code?: string;
   message?: string;
   description: string;
@@ -113,6 +168,8 @@ const mutate = (base: Json, f: (c: Json) => void) => {
 const cases: Case[] = [
   { file: "valid/example-ramp.geocourse.json", valid: true, description: "The example from section 9: 25 m at a steady 8 %, heading east.", text: exampleText },
   { file: "valid/stadium-loop.geocourse.json", valid: true, description: "Closed local-frame loop with two 30 m bends, one wrapping through the start line.", course: loop },
+  { file: "valid/s-bend.geocourse.json", valid: true, description: "A left bend straight into a right bend, listed as two bends split where the direction changes.", course: sBend },
+  { file: "valid/bend-at-start.geocourse.json", valid: true, description: "An open course that starts on a bend, measured with the window clamped at the start.", course: clamped },
   {
     file: "invalid/01-type.geocourse.json", valid: false, rule: 1, message: 'type must be "Course"',
     description: 'type is "course", not "Course".', course: mutate(example, (c) => { c.type = "course"; }),
@@ -135,6 +192,11 @@ const cases: Case[] = [
     file: "invalid/05-no-heading.geocourse.json", valid: false, rule: 5, message: "either geometry or profile.heading",
     description: "Neither geometry nor profile.heading is present.",
     course: mutate(example, (c) => { delete c.geometry; delete c.profile.heading; delete c.profile.bendRadiusLimit; }),
+  },
+  {
+    file: "invalid/05-heading-360.geocourse.json", valid: false, rule: 5, message: "heading 360° is outside [0, 360)",
+    description: "A heading stored as 3600 at scale 0.1; writers must store it as 0.",
+    course: mutate(example, (c) => { c.profile.heading.values[3] = 3600; }),
   },
   {
     file: "invalid/06-range-past-end.geocourse.json", valid: false, rule: 6, message: "is outside [0, length",
@@ -172,6 +234,11 @@ const cases: Case[] = [
     course: mutate(loop, (c) => { c.profile.elevation.values[c.profile.elevation.values.length - 1] = 1001; }),
   },
   {
+    file: "invalid/spec-5.9-finish-on-loop.geocourse.json", valid: false, code: "spec", message: "a closed course must not have a finish marker",
+    description: "The stadium loop with a finish marker; a closed course must not have one (spec 5.9).",
+    course: mutate(loop, (c) => { c.ranges.push({ type: "marker", from: 0, to: 0, properties: { kind: "finish" } }); }),
+  },
+  {
     file: "invalid/13-required-extension.geocourse.json", valid: false, rule: 13, message: 'required extension "acme_wind" is not in extensionsUsed',
     description: "extensionsRequired names an extension missing from extensionsUsed.",
     course: mutate(example, (c) => { c.extensionsRequired = ["acme_wind"]; }),
@@ -191,9 +258,9 @@ for (const c of cases) writeFileSync(join(out, c.file), c.text ?? format(c.cours
 
 const manifest = {
   format: "0.1",
-  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error for the given rule of section 8; message is a substring of the reference validator's error.",
+  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R14 for the rules of section 8, spec for other MUST text); message is a substring of the reference validator's error.",
   pending: [{ file: "valid/frost-gate-traverse.geocourse.json", description: "Frost Gate Traverse, 75.6 km: first export from the reference writer, to be added." }],
-  tests: cases.map(({ file, valid, rule, message, description }) => ({ file, valid, ...(rule ? { rule, code: `R${rule}`, message } : {}), description })),
+  tests: cases.map(({ file, valid, rule, code, message, description }) => ({ file, valid, ...(valid ? {} : { ...(rule ? { rule } : {}), code: code ?? `R${rule}`, message }), description })),
 };
 writeFileSync(join(out, "manifest.json"), format(manifest) + "\n");
 console.log(`wrote ${cases.length} test files and manifest.json to ${out}`);

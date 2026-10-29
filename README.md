@@ -28,7 +28,7 @@ GeoCourse puts the road into the file. Everything is placed by distance along th
 | [`tests/0.1/`](https://geocourse.org/tests/0.1/) | Valid and invalid test files with a manifest of expected results |
 | [`registry/`](https://geocourse.org/registry/) | Range types, `kind` values, extension names and the attribution licence list |
 
-Published spec and schema versions never change; fixes go into a new version.
+A draft such as 0.1 may still change until it is declared released. After that it is frozen, and fixes go into a new version.
 
 ## Validate a file
 

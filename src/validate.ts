@@ -90,8 +90,8 @@ class Validator {
   private length = NaN;
   private closed = false;
 
-  private err(rule: number | undefined, path: string, message: string) {
-    this.issues.push({ severity: "error", rule, code: rule ? `R${rule}` : "structure", path, message });
+  private err(rule: number | undefined, path: string, message: string, code = "structure") {
+    this.issues.push({ severity: "error", rule, code: rule ? `R${rule}` : code, path, message });
   }
   private warn(code: string, path: string, message: string) {
     this.issues.push({ severity: "warning", code, path, message });
@@ -491,7 +491,7 @@ class Validator {
     });
   }
 
-  /** MUST and SHOULD text outside section 8. Reported as warnings, since section 8 alone decides validity. */
+  /** MUST and SHOULD text outside section 8: warnings, except a finish marker on a closed course (5.9), which is an error. */
   private otherSpecText(ranges: Range[], profileOk: boolean) {
     for (const r of ranges) {
       const p = `/ranges/${r.index}`;
@@ -517,7 +517,10 @@ class Validator {
       if (Math.abs(gain - s.elevationGain) > 1e-6 * Math.max(1, gain))
         this.warn("spec", "/summary/elevationGain", `summary.elevationGain is ${s.elevationGain}, the samples give ${+gain.toFixed(6)} (spec 3 says MUST equal)`);
     }
-    if (!this.closed) {
+    if (this.closed) {
+      for (const r of ranges)
+        if (r.type === "marker" && r.props.kind === "finish") this.err(undefined, `/ranges/${r.index}`, "a closed course must not have a finish marker (spec 5.9)", "spec");
+    } else {
       const at = (kind: string, d: number) => ranges.some((r) => r.type === "marker" && r.props.kind === kind && Math.abs(r.from - d) <= TOLERANCE.distance);
       if (!at("start", 0)) this.warn("spec", "/ranges", "open course has no start marker at 0 (spec 5.9 SHOULD)");
       if (!at("finish", this.length)) this.warn("spec", "/ranges", "open course has no finish marker at length (spec 5.9 SHOULD)");

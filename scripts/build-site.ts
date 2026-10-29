@@ -122,7 +122,7 @@ copyFileSync(join(root, "schema/0.1/geocourse.schema.json"), join(out, "schema/0
 page("/schema/", "GeoCourse schema", `<h1 id="schema">Schema</h1>
 <p>JSON Schema 2020-12 for GeoCourse 0.1. It checks structure, types, patterns and value ranges. Sample counts, coverage and other cross-references need the <a href="/validator/">reference validator</a>, which checks every rule of section 8.</p>
 ${table(["Version", "$id", "Spec"], [["0.1", `<a href="${esc(schemaId)}">${esc(schemaId)}</a>`, `<a href="/spec/0.1/#8-validation-rules">Draft 0.1, section 8</a>`]])}
-<p>A file may name the schema in <code>$schema</code> so editors find it. Readers must not depend on it or fetch it to read a file (spec 3). Published versions never change; fixes go into a new version.</p>
+<p>A file may name the schema in <code>$schema</code> so editors find it. Readers must not depend on it or fetch it to read a file (spec 3). A draft such as 0.1 may change until it is declared released; after that it is frozen and fixes go into a new version.</p>
 <h2 id="schema-0-1">0.1</h2>
 <pre><code>${esc(schemaText)}</code></pre>`);
 
@@ -148,13 +148,13 @@ redirect("/request/", REQUEST);
 const manifest = JSON.parse(read("tests/0.1/manifest.json"));
 cpSync(join(root, "tests/0.1"), join(out, "tests/0.1"), { recursive: true, filter: (p) => !p.endsWith(".md") });
 copyFileSync(join(root, "tests/LICENSE"), join(out, "tests/LICENSE.txt"));
-type T = { file: string; valid: boolean; rule?: number; message?: string; description: string };
+type T = { file: string; valid: boolean; rule?: number; code?: string; message?: string; description: string };
 const link = (f: string) => `<a href="/tests/0.1/${f}">${esc(f.split("/")[1])}</a>`;
 page("/tests/0.1/", "GeoCourse 0.1 test files", `${render(read("tests/0.1/README.md"), "tests/0.1/README.md")}
 <h2 id="valid-files">Valid files</h2>
 ${table(["File", "Description"], manifest.tests.filter((t: T) => t.valid).map((t: T) => [link(t.file), esc(t.description)]))}
 <h2 id="invalid-files">Invalid files</h2>
-${table(["Rule", "File", "Description", "Expected error contains"], manifest.tests.filter((t: T) => !t.valid).map((t: T) => [String(t.rule), link(t.file), esc(t.description), code(t.message ?? "")]))}`);
+${table(["Rule", "File", "Description", "Expected error contains"], manifest.tests.filter((t: T) => !t.valid).map((t: T) => [t.rule ? String(t.rule) : esc(t.code ?? ""), link(t.file), esc(t.description), code(t.message ?? "")]))}`);
 
 // Other pages, licences and redirects.
 page("/validator/", "GeoCourse reference validator", render(read("src/README.md"), "src/README.md"));

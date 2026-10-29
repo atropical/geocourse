@@ -1,6 +1,6 @@
 {
   "format": "0.1",
-  "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error for the given rule of section 8; message is a substring of the reference validator's error.",
+  "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R14 for the rules of section 8, spec for other MUST text); message is a substring of the reference validator's error.",
   "pending": [
     {
       "file": "valid/frost-gate-traverse.geocourse.json",
@@ -17,6 +17,16 @@
       "file": "valid/stadium-loop.geocourse.json",
       "valid": true,
       "description": "Closed local-frame loop with two 30 m bends, one wrapping through the start line."
+    },
+    {
+      "file": "valid/s-bend.geocourse.json",
+      "valid": true,
+      "description": "A left bend straight into a right bend, listed as two bends split where the direction changes."
+    },
+    {
+      "file": "valid/bend-at-start.geocourse.json",
+      "valid": true,
+      "description": "An open course that starts on a bend, measured with the window clamped at the start."
     },
     {
       "file": "invalid/01-type.geocourse.json",
@@ -57,6 +67,14 @@
       "code": "R5",
       "message": "either geometry or profile.heading",
       "description": "Neither geometry nor profile.heading is present."
+    },
+    {
+      "file": "invalid/05-heading-360.geocourse.json",
+      "valid": false,
+      "rule": 5,
+      "code": "R5",
+      "message": "heading 360° is outside [0, 360)",
+      "description": "A heading stored as 3600 at scale 0.1; writers must store it as 0."
     },
     {
       "file": "invalid/06-range-past-end.geocourse.json",
@@ -113,6 +131,13 @@
       "code": "R12",
       "message": "first and last elevation samples differ",
       "description": "The stadium loop ends 0.1 m higher than it starts."
+    },
+    {
+      "file": "invalid/spec-5.9-finish-on-loop.geocourse.json",
+      "valid": false,
+      "code": "spec",
+      "message": "a closed course must not have a finish marker",
+      "description": "The stadium loop with a finish marker; a closed course must not have one (spec 5.9)."
     },
     {
       "file": "invalid/13-required-extension.geocourse.json",

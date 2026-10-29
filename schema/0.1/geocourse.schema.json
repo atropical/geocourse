@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://geocourse.org/schema/0.1/geocourse.schema.json",
   "title": "GeoCourse 0.1",
-  "description": "Structure, types, patterns and value ranges of a GeoCourse 0.1 file (spec sections 3 to 8). Sample counts, coverage and other cross-references are checked by the reference validator only. Published versions never change.",
+  "description": "Structure, types, patterns and value ranges of a GeoCourse 0.1 file (spec sections 3 to 8). Sample counts, coverage and other cross-references are checked by the reference validator only. A draft may change until it is declared released; after that it is frozen.",
   "type": "object",
   "required": ["type", "format", "id", "version", "name", "length", "closed", "profile", "ranges"],
   "properties": {
@@ -162,7 +162,7 @@
               "properties": {
                 "properties": {
                   "width": { "type": "number", "exclusiveMinimum": 0 },
-                  "widthSource": { "enum": ["osm", "survey", "estimated"] },
+                  "widthSource": { "enum": ["osm", "survey", "estimated", "design"] },
                   "highway": { "type": "string" },
                   "lanes": { "type": "integer", "minimum": 1 },
                   "name": { "type": "string" },

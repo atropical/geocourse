@@ -93,7 +93,7 @@ Both use the same sampling rule. With step s, there are n = ceil(`length` / s) +
 - **Between samples** elevation and grade are linear; heading is linear along the shorter arc (359° to 1° passes through 0°).
 - **Grade wins for physics.** When `grade` is present it is the riding grade and readers MUST use it for resistance, in place of the elevation slope. It MAY be smoothed, but over any 1 km its integral MUST match the change in elevation within 2 m, so climbs add up.
 - **Derived grade.** When absent: gradeᵢ = (eᵢ₊₁ − eᵢ₋₁) / (dᵢ₊₁ − dᵢ₋₁), one-sided at the ends of an open course, wrapping on a closed one.
-- **Heading.** When absent, it is the bearing of the geometry at d. When both exist, `heading` wins for wind and trainer data, geometry wins for drawing.
+- **Heading.** When absent, it is the bearing of the geometry at d. When both exist, `heading` wins for wind and trainer data, geometry wins for drawing. Writers MUST store a heading that rounds to 360° as 0.
 - `bendRadiusLimit`: metres. When given, the `bend` ranges are complete up to that radius (5.4).
 
 ## 5. Ranges
@@ -149,19 +149,19 @@ The way the course runs on: a road, cycle path, track or trail. Road ranges SHOU
 | Property | Req. | Meaning |
 |---|---|---|
 | `width` | SHOULD | Metres of usable surface, edge to edge (a two-way road: the full carriageway), > 0 |
-| `widthSource` | MAY | `"osm"`, `"survey"` or `"estimated"` |
+| `widthSource` | MAY | `"osm"`, `"survey"`, `"estimated"` or `"design"` |
 | `highway` | SHOULD | OSM class: `primary`, `residential`, `cycleway`, `track`, `path`, … |
 | `lanes`, `name`, `ref`, `lit`, `cycleway` | MAY | Lane count, road name, road number, street lights, OSM cycleway value |
 
-Width lets a reader draw the road at the right size, keep riders on it, and judge room for passing and drafting. It has no physics effect. OSM often has no `width` tag, so writers SHOULD estimate one and mark it `estimated`. When width is missing, readers SHOULD assume one from `highway` (informative: primary 7 m, residential 5 m, cycleway 2.5 m, track 3 m, path 1.5 m).
+Width lets a reader draw the road at the right size, keep riders on it, and judge room for passing and drafting. It has no physics effect. OSM often has no `width` tag, so writers SHOULD estimate one and mark it `estimated`. A designed course's width is exact; mark it `design`. When width is missing, readers SHOULD assume one from `highway` (informative: primary 7 m, residential 5 m, cycleway 2.5 m, track 3 m, path 1.5 m).
 
 ### 5.4 `bend`
 
 `radius` MUST (m, at the tightest point, > 0), `direction` MUST (`"left"` or `"right"`), `apex` MUST (d of the tightest point, within the range; where the radius stays within 1 % of its minimum over a stretch, as on a constant-radius arc, the middle of that stretch).
 
-- **Measuring.** Resample the geometry at 1 m. Radius at d is r = 20 m ÷ |Δψ|, where Δψ is the change in heading in radians, unwrapped, between d − 10 m and d + 10 m. Every writer then measures the same bend the same way.
+- **Measuring.** Resample the geometry at 1 m. Radius at d is r = 20 m ÷ |Δψ|, where Δψ is the change in heading in radians, unwrapped, between d − 10 m and d + 10 m. Every writer then measures the same bend the same way. On an open course the window is clamped at the ends: within 10 m of the start or finish, r is the clamped span ÷ |Δψ|. On a closed course the window wraps through the start.
 - **Why a 20 m window.** It averages out mapping noise and still reads real bends: a 2° wobble on a straight reads as about 570 m (not a bend), a 90° junction drawn as one sharp OSM corner reads as about 13 m (close to a real junction), and hairpins read true down to about 7 m radius. Tighter hairpins read slightly wide; a 5 m hairpin reads about 6.4 m.
-- **What counts.** A bend is a stretch where r stays below `bendRadiusLimit`. Writers SHOULD use 400 m. Road authorities design cycle curves for a side friction of about 0.2 to 0.3, far below the tyre limit: AASHTO asks for 27 m at 30 km/h, the UK's LTN 1/20 for 25 m, the Dutch CROW manual for 20 m. At that comfort level a 400 m bend is taken at about 110 km/h, so 400 m covers every bend a rider would ease off for, even on fast descents. When the limit is given, every such stretch MUST be listed. Two bends in the same direction less than 10 m apart are one bend. Bends MUST NOT overlap.
+- **What counts.** A bend is a stretch where r stays below `bendRadiusLimit`. Writers SHOULD use 400 m. Road authorities design cycle curves for a side friction of about 0.2 to 0.3, far below the tyre limit: AASHTO asks for 27 m at 30 km/h, the UK's LTN 1/20 for 25 m, the Dutch CROW manual for 20 m. At that comfort level a 400 m bend is taken at about 110 km/h, so 400 m covers every bend a rider would ease off for, even on fast descents. When the limit is given, every such stretch MUST be listed. A stretch that turns one way and then the other is split where the direction changes, so each bend turns one way. Two bends in the same direction less than 10 m apart are one bend. Bends MUST NOT overlap.
 - **Safe speed** is the reader's business. Informative: two speeds matter. The comfortable speed, v = √(0.25 · g · r), matches what road authorities design for and suits slow-down cues. The limit, v = √(grip · g · r) with grip at the apex, is where tyres slide and suits crash rules. Both apply to the whole bend so warnings come early. Unpaved surfaces need 1.5 to 2 times the radius for the same speed (ECF), which their lower grip already gives.
 
 ### 5.5 `climb`
@@ -182,7 +182,7 @@ A timed stretch for results. Range `id` MUST be present and stay the same across
 
 ### 5.9 `marker`
 
-`kind` MUST: `start`, `finish`, `summit`, `sprint`, `feed`, `town`, `viewpoint`, `sign` or `info`. `name` and `text` MAY. Usually a point. An open course SHOULD have `start` at 0 and `finish` at `length`.
+`kind` MUST: `start`, `finish`, `summit`, `sprint`, `feed`, `town`, `viewpoint`, `sign` or `info`. `name` and `text` MAY. Usually a point. An open course SHOULD have `start` at 0 and `finish` at `length`. A closed course SHOULD have `start` at 0 and MUST NOT have a `finish`: laps, and where a ride ends, are up to the reader.
 
 ## 6. OpenStreetMap linking
 
@@ -225,7 +225,7 @@ A range MAY name the OpenStreetMap elements it came from:
 
 - A minor release only adds optional members, range types or values. A reader for major M reads every M.x file, ignoring what it doesn't know.
 - A major release is needed whenever an older reader would misread a newer file. Readers MUST refuse a major they don't support.
-- While major is 0 any release may break. Format 1.0 locks once two independent apps ride the same test files and get the same results.
+- While major is 0 any release may break. A draft such as 0.1 may still change until it is declared released; after that it is frozen. Format 1.0 locks once two independent apps ride the same test files and get the same results.
 - `format` versions the spec; the course's own `version` versions the content. They never move together.
 
 ## 8. Validation rules
@@ -240,7 +240,7 @@ A file is valid only when all of these hold. A JSON Schema (https://geocourse.or
 6. Every range has 0 ≤ `from`, `to` ≤ `length`, and `from` ≤ `to` unless `closed` is true. Range `id`s are unique in the file.
 7. Surface ranges cover [0, `length`] exactly, with no gaps or overlaps; `crr` ≥ 0, `grip` > 0.
 8. Geometry length agrees with d within max(1 m, 0.5 %) at every sample.
-9. When `grade` is present, its integral matches the elevation change within 2 m over every 1 km window.
+9. When `grade` is present, its integral matches the elevation change within 2 m over every 1 km window. A window starts at every profile sample and slides by one sample; a course of 1 km or less is checked as one window; windows do not wrap on a closed course.
 10. Bends have `radius` > 0 and `apex` inside the range, and do not overlap; with `bendRadiusLimit` set, none is missing: every measured bend has a listed bend in the same direction whose apex lies within the measured stretch, give or take 1 m.
 11. Every `segment` has an `id`.
 12. On a closed course the first and last elevation samples are equal, and the first and last geometry positions are within 1 m.
@@ -337,14 +337,14 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 The reference writer's first export is valid under every rule of section 8: 75.6 km, 756 KB (289 KB gzip), 816 bends (format 0: 183 KB, 881 bends with an 8 m window).
 
 - [ ] **Size.** Geometry at 2 m is 77 % of the file (582 KB, 234 KB gzip). Consider delta-encoding positions, or a step that may grow on straights.
-- [ ] **Bend window at the ends.** 5.4 doesn't say what happens within 10 m of the start or end of an open course. The writer clamps the window and divides by the shorter span; say so, or say the bend ends there.
-- [ ] **S-bends.** A stretch under the limit can turn left, then right, with no straight between. The writer splits it where the turn changes sign; the spec should say that.
+- [x] **Bend window at the ends.** 5.4 doesn't say what happens within 10 m of the start or end of an open course. The writer clamps the window and divides by the shorter span; say so, or say the bend ends there.
+- [x] **S-bends.** A stretch under the limit can turn left, then right, with no straight between. The writer splits it where the turn changes sign; the spec should say that.
 - [x] **"None missing" needs a tolerance.** The validator recomputes bends from the geometry and accepts a listed bend within 1 m of each measured apex. Say how close is close enough, or validators will disagree.
-- [ ] **1 km windows in rule 9.** Say whether a window slides by one sample, and what a course shorter than 1 km checks (the writer uses the whole course).
-- [ ] **Heading rounding.** 359.96° at scale 0.1 rounds to 3600, outside [0, 360). Writers must wrap it to 0; say so in 4.2.
-- [ ] **Rule 14.** "Requires attribution" needs a list; the validator assumes ODbL and CC-BY.
-- [ ] **Finish on a loop.** On a closed course a finish marker at length is the same point as 0. Say whether a loop has a finish marker, and where.
-- [ ] **widthSource for designed roads.** A fictional course's width is exact by design: neither osm, survey nor estimated fits. Suggest "design".
+- [x] **1 km windows in rule 9.** Say whether a window slides by one sample, and what a course shorter than 1 km checks (the writer uses the whole course).
+- [x] **Heading rounding.** 359.96° at scale 0.1 rounds to 3600, outside [0, 360). Writers must wrap it to 0; say so in 4.2.
+- [x] **Rule 14.** Resolved: the registry's attribution list decides (rule 14).
+- [x] **Finish on a loop.** On a closed course a finish marker at length is the same point as 0. Say whether a loop has a finish marker, and where.
+- [x] **widthSource for designed roads.** A fictional course's width is exact by design: neither osm, survey nor estimated fits. Suggest "design".
 
 ## Appendix A. GPX and FIT (informative)
 
