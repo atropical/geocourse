@@ -234,11 +234,6 @@ const cases: Case[] = [
     course: mutate(loop, (c) => { c.profile.elevation.values[c.profile.elevation.values.length - 1] = 1001; }),
   },
   {
-    file: "invalid/spec-5.9-finish-on-loop.geocourse.json", valid: false, code: "spec", message: "a closed course must not have a finish marker",
-    description: "The stadium loop with a finish marker; a closed course must not have one (spec 5.9).",
-    course: mutate(loop, (c) => { c.ranges.push({ type: "marker", from: 0, to: 0, properties: { kind: "finish" } }); }),
-  },
-  {
     file: "invalid/13-required-extension.geocourse.json", valid: false, rule: 13, message: 'required extension "acme_wind" is not in extensionsUsed',
     description: "extensionsRequired names an extension missing from extensionsUsed.",
     course: mutate(example, (c) => { c.extensionsRequired = ["acme_wind"]; }),
@@ -247,6 +242,11 @@ const cases: Case[] = [
     file: "invalid/14-attribution.geocourse.json", valid: false, rule: 14, message: "requires attribution",
     description: "OpenStreetMap data (ODbL-1.0) with no attribution.",
     course: mutate(example, (c) => { delete c.attribution; }),
+  },
+  {
+    file: "invalid/15-finish-on-loop.geocourse.json", valid: false, rule: 15, message: "a closed course must not have a finish marker",
+    description: "The stadium loop with a finish marker; a closed course has none.",
+    course: mutate(loop, (c) => { c.ranges.push({ type: "marker", from: 0, to: 0, properties: { kind: "finish" } }); }),
   },
 ];
 
@@ -258,7 +258,7 @@ for (const c of cases) writeFileSync(join(out, c.file), c.text ?? format(c.cours
 
 const manifest = {
   format: "0.1",
-  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R14 for the rules of section 8, spec for other MUST text); message is a substring of the reference validator's error.",
+  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R15, the rules of section 8); message is a substring of the reference validator's error.",
   pending: [{ file: "valid/frost-gate-traverse.geocourse.json", description: "Frost Gate Traverse, 75.6 km: first export from the reference writer, to be added." }],
   tests: cases.map(({ file, valid, rule, code, message, description }) => ({ file, valid, ...(valid ? {} : { ...(rule ? { rule } : {}), code: code ?? `R${rule}`, message }), description })),
 };

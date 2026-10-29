@@ -246,6 +246,7 @@ A file is valid only when all of these hold. A JSON Schema (https://geocourse.or
 12. On a closed course the first and last elevation samples are equal, and the first and last geometry positions are within 1 m.
 13. Every name in `extensionsRequired` is also in `extensionsUsed`.
 14. `attribution` is present whenever a source licence is on the registry's attribution list. An unknown licence id is a warning, not an error.
+15. A closed course has no `finish` marker.
 
 Test files are published at https://geocourse.org/tests/0.1/: valid files a reader must accept and ride to known results (Frost Gate Traverse among them), and invalid files, one per rule, that a validator must reject.
 

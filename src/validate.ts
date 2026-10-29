@@ -10,7 +10,7 @@ export interface Issue {
   severity: Severity;
   /** Rule number in spec section 8, when the issue breaks one. */
   rule?: number;
-  /** "R1" to "R14" for section 8 rules, "encoding" for spec 2, "structure" for the shape of sections 3 to 7, "spec" for other spec text. */
+  /** "R1" to "R15" for section 8 rules, "encoding" for spec 2, "structure" for the shape of sections 3 to 7, "spec" for other spec text. */
   code: string;
   /** JSON Pointer to the offending value. */
   path: string;
@@ -90,8 +90,8 @@ class Validator {
   private length = NaN;
   private closed = false;
 
-  private err(rule: number | undefined, path: string, message: string, code = "structure") {
-    this.issues.push({ severity: "error", rule, code: rule ? `R${rule}` : code, path, message });
+  private err(rule: number | undefined, path: string, message: string) {
+    this.issues.push({ severity: "error", rule, code: rule ? `R${rule}` : "structure", path, message });
   }
   private warn(code: string, path: string, message: string) {
     this.issues.push({ severity: "warning", code, path, message });
@@ -491,7 +491,7 @@ class Validator {
     });
   }
 
-  /** MUST and SHOULD text outside section 8: warnings, except a finish marker on a closed course (5.9), which is an error. */
+  /** Rule 15, then MUST and SHOULD text outside section 8, reported as warnings. */
   private otherSpecText(ranges: Range[], profileOk: boolean) {
     for (const r of ranges) {
       const p = `/ranges/${r.index}`;
@@ -519,7 +519,7 @@ class Validator {
     }
     if (this.closed) {
       for (const r of ranges)
-        if (r.type === "marker" && r.props.kind === "finish") this.err(undefined, `/ranges/${r.index}`, "a closed course must not have a finish marker (spec 5.9)", "spec");
+        if (r.type === "marker" && r.props.kind === "finish") this.err(15, `/ranges/${r.index}`, "a closed course must not have a finish marker");
     } else {
       const at = (kind: string, d: number) => ranges.some((r) => r.type === "marker" && r.props.kind === kind && Math.abs(r.from - d) <= TOLERANCE.distance);
       if (!at("start", 0)) this.warn("spec", "/ranges", "open course has no start marker at 0 (spec 5.9 SHOULD)");

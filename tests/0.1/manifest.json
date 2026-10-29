@@ -1,6 +1,6 @@
 {
   "format": "0.1",
-  "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R14 for the rules of section 8, spec for other MUST text); message is a substring of the reference validator's error.",
+  "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R15, the rules of section 8); message is a substring of the reference validator's error.",
   "pending": [
     {
       "file": "valid/frost-gate-traverse.geocourse.json",
@@ -133,13 +133,6 @@
       "description": "The stadium loop ends 0.1 m higher than it starts."
     },
     {
-      "file": "invalid/spec-5.9-finish-on-loop.geocourse.json",
-      "valid": false,
-      "code": "spec",
-      "message": "a closed course must not have a finish marker",
-      "description": "The stadium loop with a finish marker; a closed course must not have one (spec 5.9)."
-    },
-    {
       "file": "invalid/13-required-extension.geocourse.json",
       "valid": false,
       "rule": 13,
@@ -154,6 +147,14 @@
       "code": "R14",
       "message": "requires attribution",
       "description": "OpenStreetMap data (ODbL-1.0) with no attribution."
+    },
+    {
+      "file": "invalid/15-finish-on-loop.geocourse.json",
+      "valid": false,
+      "rule": 15,
+      "code": "R15",
+      "message": "a closed course must not have a finish marker",
+      "description": "The stadium loop with a finish marker; a closed course has none."
     }
   ]
 }

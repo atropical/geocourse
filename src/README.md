@@ -19,11 +19,10 @@ const { valid, issues } = validateText(text);
 
 | Code | Severity | Meaning |
 |---|---|---|
-| `R1` to `R14` | error | A rule of section 8 is broken |
+| `R1` to `R15` | error | A rule of section 8 is broken |
 | `encoding` | error | Not I-JSON (spec 2): byte-order mark, duplicate member names, integers beyond ±2⁵³, or not JSON at all |
 | `structure` | error | A required member is missing or has the wrong type (sections 3 to 7), matching what the schema checks |
 | `R10`, `R14` | warning | Bend completeness not checked (no geometry); a licence id not on the registry's attribution list |
-| `spec` | error | A finish marker on a closed course (spec 5.9) |
 | `spec` | warning | Other MUST or SHOULD text outside section 8: summary `elevationGain` not matching the samples, extensions not listed in `extensionsUsed`, unknown range types, missing start or finish markers on an open course |
 
 Other spec text outside section 8 is reported as warnings.
