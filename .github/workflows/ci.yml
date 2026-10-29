@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate all test files
+        run: npm test
+      - name: Test files are up to date with the generator
+        run: npm run make-tests && git diff --exit-code tests/
+      - name: Build site
+        run: npm run site

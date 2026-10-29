@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geocourse.org/schema/0.1/geocourse.schema.json",
+  "title": "GeoCourse 0.1",
+  "description": "Structure, types, patterns and value ranges of a GeoCourse 0.1 file (spec sections 3 to 8). Sample counts, coverage and other cross-references are checked by the reference validator only. Published versions never change.",
+  "type": "object",
+  "required": ["type", "format", "id", "version", "name", "length", "closed", "profile", "ranges"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "type": { "const": "Course" },
+    "format": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+    "id": { "type": "string", "pattern": "^[a-z0-9-]{1,64}$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "length": { "type": "number", "exclusiveMinimum": 0 },
+    "closed": { "type": "boolean" },
+    "created": { "$ref": "#/$defs/timestamp" },
+    "authors": { "type": "array", "items": { "type": "string" } },
+    "licence": { "type": "string" },
+    "attribution": { "type": "array", "items": { "type": "string" } },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "elevationGain": { "type": "number", "minimum": 0 },
+        "elevationLoss": { "type": "number", "minimum": 0 },
+        "maxGrade": { "type": "number" }
+      }
+    },
+    "geometry": { "$ref": "#/$defs/geometry" },
+    "profile": { "$ref": "#/$defs/profile" },
+    "ranges": { "type": "array", "items": { "$ref": "#/$defs/range" } },
+    "osm": {
+      "type": "object",
+      "properties": {
+        "snapshot": { "$ref": "#/$defs/timestamp" },
+        "relation": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "extensionsUsed": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/extensionName" } },
+    "extensionsRequired": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/extensionName" } },
+    "extensions": { "$ref": "#/$defs/extensions" }
+  },
+  "anyOf": [
+    { "required": ["geometry"] },
+    { "required": ["profile"], "properties": { "profile": { "required": ["heading"] } } }
+  ],
+  "$defs": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "extensionName": { "type": "string", "pattern": "^[a-z0-9]+_[a-z0-9_]+$" },
+    "vendorValue": { "type": "string", "pattern": "^[a-z0-9]+:[a-z0-9_]+$" },
+    "extensions": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/extensionName" },
+      "additionalProperties": { "type": "object" }
+    },
+    "source": {
+      "type": "object",
+      "required": ["kind", "name", "licence"],
+      "properties": {
+        "kind": { "enum": ["geometry", "elevation", "road"] },
+        "name": { "type": "string" },
+        "licence": { "type": "string" },
+        "url": { "type": "string" },
+        "retrieved": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "required": ["scale", "values"],
+      "properties": {
+        "scale": { "type": "number", "exclusiveMinimum": 0 },
+        "values": { "type": "array", "items": { "type": "integer" } }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["frame", "step", "scale", "positions"],
+      "properties": {
+        "frame": { "enum": ["wgs84", "local"] },
+        "step": { "type": "number", "exclusiveMinimum": 0 },
+        "scale": { "type": "number", "exclusiveMinimum": 0 },
+        "positions": { "type": "array", "minItems": 4, "items": { "type": "integer" } },
+        "origin": {
+          "type": "object",
+          "required": ["lon", "lat"],
+          "properties": {
+            "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+            "lat": { "type": "number", "minimum": -90, "maximum": 90 }
+          }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "if": { "properties": { "frame": { "const": "wgs84" } } },
+      "then": { "not": { "required": ["origin"] } }
+    },
+    "profile": {
+      "type": "object",
+      "required": ["step", "elevation"],
+      "properties": {
+        "step": { "type": "number", "exclusiveMinimum": 0, "maximum": 50 },
+        "elevation": { "$ref": "#/$defs/channel" },
+        "grade": { "$ref": "#/$defs/channel" },
+        "heading": { "$ref": "#/$defs/channel" },
+        "bendRadiusLimit": { "type": "number", "exclusiveMinimum": 0 },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      }
+    },
+    "osmRef": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["way", "node", "relation"] },
+        "id": { "type": "integer", "minimum": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "from": { "type": "number", "minimum": 0 },
+        "to": { "type": "number", "minimum": 0 }
+      }
+    },
+    "range": {
+      "type": "object",
+      "required": ["type", "from", "to"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "from": { "type": "number", "minimum": 0 },
+        "to": { "type": "number", "minimum": 0 },
+        "id": { "type": "string", "minLength": 1 },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "tags": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        },
+        "osm": { "type": "array", "items": { "$ref": "#/$defs/osmRef" } },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "surface" } } },
+          "then": {
+            "required": ["properties"],
+            "properties": {
+              "properties": {
+                "required": ["crr", "grip"],
+                "properties": {
+                  "crr": { "type": "number", "minimum": 0 },
+                  "grip": { "type": "number", "exclusiveMinimum": 0 },
+                  "surface": { "type": "string" },
+                  "smoothness": { "type": "string" },
+                  "tracktype": { "type": "string" },
+                  "name": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "road" } } },
+          "then": {
+            "properties": {
+              "properties": {
+                "properties": {
+                  "width": { "type": "number", "exclusiveMinimum": 0 },
+                  "widthSource": { "enum": ["osm", "survey", "estimated"] },
+                  "highway": { "type": "string" },
+                  "lanes": { "type": "integer", "minimum": 1 },
+                  "name": { "type": "string" },
+                  "ref": { "type": "string" },
+                  "lit": { "type": "string" },
+                  "cycleway": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "bend" } } },
+          "then": {
+            "required": ["properties"],
+            "properties": {
+              "properties": {
+                "required": ["radius", "direction", "apex"],
+                "properties": {
+                  "radius": { "type": "number", "exclusiveMinimum": 0 },
+                  "direction": { "enum": ["left", "right"] },
+                  "apex": { "type": "number", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "climb" } } },
+          "then": {
+            "properties": {
+              "properties": {
+                "properties": {
+                  "name": { "type": "string" },
+                  "category": { "enum": ["4", "3", "2", "1", "HC"] }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "segment" } } },
+          "then": {
+            "required": ["id"],
+            "properties": { "properties": { "properties": { "name": { "type": "string" } } } }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "structure" } } },
+          "then": {
+            "required": ["properties"],
+            "properties": {
+              "properties": {
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "anyOf": [{ "enum": ["bridge", "tunnel", "building_passage"] }, { "$ref": "#/$defs/vendorValue" }] },
+                  "name": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "hazard" } } },
+          "then": {
+            "required": ["properties"],
+            "properties": {
+              "properties": {
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "anyOf": [{ "enum": ["cattle_grid", "speed_bump", "railway_crossing", "ford", "gate"] }, { "$ref": "#/$defs/vendorValue" }] }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "marker" } } },
+          "then": {
+            "required": ["properties"],
+            "properties": {
+              "properties": {
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "anyOf": [{ "enum": ["start", "finish", "summit", "sprint", "feed", "town", "viewpoint", "sign", "info"] }, { "$ref": "#/$defs/vendorValue" }] },
+                  "name": { "type": "string" },
+                  "text": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

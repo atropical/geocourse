@@ -1,0 +1,34 @@
+name: Registry name request
+description: Request a range type, kind value, extension name or attribution licence for the GeoCourse registry.
+title: "Registry: "
+labels: ["registry"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is it?
+      options:
+        - Extension name (vendor_feature)
+        - Extension range type (vendor:name)
+        - Extension kind value (vendor:name)
+        - Attribution licence (SPDX id)
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      placeholder: acme_scenery
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: One paragraph. For a range type or kind, say which range type it belongs to and whether it changes how a course rides.
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Documentation link (optional)

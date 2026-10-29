@@ -1,0 +1,48 @@
+{
+  "$schema": "https://geocourse.org/schema/0.1/geocourse.schema.json",
+  "type": "Course",
+  "format": "0.1",
+  "id": "example-ramp",
+  "version": 1,
+  "name": "Example ramp",
+  "length": 25,
+  "closed": false,
+  "licence": "ODbL-1.0",
+  "attribution": ["© OpenStreetMap contributors"],
+  "sources": [
+    { "kind": "road", "name": "OpenStreetMap", "licence": "ODbL-1.0", "retrieved": "2026-10-01T00:00:00Z" }
+  ],
+  "summary": { "elevationGain": 2.0, "elevationLoss": 0, "maxGrade": 0.08 },
+  "geometry": {
+    "frame": "wgs84",
+    "step": 10,
+    "scale": 1e-7,
+    "positions": [107522000, 599139000, 107523792, 599139000,
+                  107525584, 599139000, 107526480, 599139000]
+  },
+  "profile": {
+    "step": 10,
+    "elevation": { "scale": 0.1, "values": [1200, 1208, 1216, 1220] },
+    "grade": { "scale": 0.0001, "values": [800, 800, 800, 800] },
+    "heading": { "scale": 0.1, "values": [900, 900, 900, 900] },
+    "bendRadiusLimit": 400
+  },
+  "ranges": [
+    { "type": "marker", "from": 0, "to": 0, "properties": { "kind": "start" } },
+    { "type": "road", "from": 0, "to": 25,
+      "properties": { "highway": "tertiary", "name": "Example Road", "width": 5.5 },
+      "osm": [{ "type": "way", "id": 123456789, "version": 7 }] },
+    { "type": "segment", "id": "example-ramp-sprint", "from": 0, "to": 25,
+      "properties": { "name": "Ramp sprint" } },
+    { "type": "surface", "from": 0, "to": 25,
+      "properties": { "crr": 0.004, "grip": 0.8, "surface": "asphalt", "smoothness": "good" },
+      "osm": [{ "type": "way", "id": 123456789, "version": 7 }] },
+    { "type": "hazard", "from": 18, "to": 18,
+      "properties": { "kind": "cattle_grid" },
+      "osm": [{ "type": "node", "id": 987654321 }] },
+    { "type": "marker", "from": 25, "to": 25, "properties": { "kind": "finish" } }
+  ],
+  "osm": { "snapshot": "2026-10-01T00:00:00Z" },
+  "extensionsUsed": ["acme_scenery"],
+  "extensions": { "acme_scenery": { "tileSize": 512 } }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "geocourse",
+  "version": "0.1.0",
+  "description": "GeoCourse spec, schema, registry, test files and reference validator",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "homepage": "https://geocourse.org",
+  "bin": {
+    "geocourse-validate": "dist/src/cli.js"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist",
+    "schema",
+    "registry"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "make-tests": "npm run build && node dist/scripts/make-tests.js",
+    "test": "npm run build && node dist/scripts/run-tests.js",
+    "site": "npm run build && node dist/scripts/build-site.js"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "marked": "^18.1.2",
+    "typescript": "^7.0.2"
+  }
+}

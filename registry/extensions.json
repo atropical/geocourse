@@ -1,0 +1,7 @@
+{
+  "registry": "extensions",
+  "format": "0.1",
+  "description": "Extension names (vendor_feature) and vendor prefixes (spec 7). The vendor acme is reserved for examples and test files and is never registered.",
+  "reserved": ["acme"],
+  "entries": []
+}

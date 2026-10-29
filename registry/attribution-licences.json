@@ -1,0 +1,21 @@
+{
+  "registry": "attribution-licences",
+  "format": "0.1",
+  "description": "SPDX licence ids for rule 14 (spec 8). A source under a licence in requireAttribution makes the course's attribution member required. Licences in noAttribution need none. Any other id is reported as a warning.",
+  "requireAttribution": [
+    "ODbL-1.0",
+    "ODC-By-1.0",
+    "CC-BY-2.0", "CC-BY-2.5", "CC-BY-3.0", "CC-BY-4.0",
+    "CC-BY-SA-2.0", "CC-BY-SA-2.5", "CC-BY-SA-3.0", "CC-BY-SA-4.0",
+    "CC-BY-NC-4.0", "CC-BY-NC-SA-4.0", "CC-BY-ND-4.0", "CC-BY-NC-ND-4.0",
+    "OGL-UK-3.0",
+    "OGL-Canada-2.0",
+    "DL-DE-BY-2.0",
+    "etalab-2.0",
+    "NLOD-2.0"
+  ],
+  "noAttribution": [
+    "CC0-1.0",
+    "PDDL-1.0"
+  ]
+}

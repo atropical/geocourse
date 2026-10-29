@@ -1,0 +1,134 @@
+{
+  "format": "0.1",
+  "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error for the given rule of section 8; message is a substring of the reference validator's error.",
+  "pending": [
+    {
+      "file": "valid/frost-gate-traverse.geocourse.json",
+      "description": "Frost Gate Traverse, 75.6 km: first export from the reference writer, to be added."
+    }
+  ],
+  "tests": [
+    {
+      "file": "valid/example-ramp.geocourse.json",
+      "valid": true,
+      "description": "The example from section 9: 25 m at a steady 8 %, heading east."
+    },
+    {
+      "file": "valid/stadium-loop.geocourse.json",
+      "valid": true,
+      "description": "Closed local-frame loop with two 30 m bends, one wrapping through the start line."
+    },
+    {
+      "file": "invalid/01-type.geocourse.json",
+      "valid": false,
+      "rule": 1,
+      "code": "R1",
+      "message": "type must be \"Course\"",
+      "description": "type is \"course\", not \"Course\"."
+    },
+    {
+      "file": "invalid/02-id.geocourse.json",
+      "valid": false,
+      "rule": 2,
+      "code": "R2",
+      "message": "id must match",
+      "description": "id has upper-case letters and an underscore."
+    },
+    {
+      "file": "invalid/03-channel-count.geocourse.json",
+      "valid": false,
+      "rule": 3,
+      "code": "R3",
+      "message": "expected ceil(length / step) + 1 = 4 values",
+      "description": "Elevation has 3 values; floor instead of ceil drops the sample at the end."
+    },
+    {
+      "file": "invalid/04-geometry-count.geocourse.json",
+      "valid": false,
+      "rule": 4,
+      "code": "R4",
+      "message": "expected 2 × (ceil(length / step) + 1) = 8 positions",
+      "description": "Geometry has 3 positions instead of 4."
+    },
+    {
+      "file": "invalid/05-no-heading.geocourse.json",
+      "valid": false,
+      "rule": 5,
+      "code": "R5",
+      "message": "either geometry or profile.heading",
+      "description": "Neither geometry nor profile.heading is present."
+    },
+    {
+      "file": "invalid/06-range-past-end.geocourse.json",
+      "valid": false,
+      "rule": 6,
+      "code": "R6",
+      "message": "is outside [0, length",
+      "description": "A hazard at 30 m on a 25 m course."
+    },
+    {
+      "file": "invalid/07-surface-gap.geocourse.json",
+      "valid": false,
+      "rule": 7,
+      "code": "R7",
+      "message": "surface gap from 20 to length 25",
+      "description": "Surface ranges stop at 20 m."
+    },
+    {
+      "file": "invalid/08-geometry-length.geocourse.json",
+      "valid": false,
+      "rule": 8,
+      "code": "R8",
+      "message": "geometry length disagrees with d",
+      "description": "The last position is 5 m too far east."
+    },
+    {
+      "file": "invalid/09-grade-integral.geocourse.json",
+      "valid": false,
+      "rule": 9,
+      "code": "R9",
+      "message": "grade integral differs from elevation change",
+      "description": "Grade says 20 % while elevation climbs 8 %."
+    },
+    {
+      "file": "invalid/10-missing-bend.geocourse.json",
+      "valid": false,
+      "rule": 10,
+      "code": "R10",
+      "message": "missing left bend",
+      "description": "The stadium loop with its north bend left out, while bendRadiusLimit says the list is complete."
+    },
+    {
+      "file": "invalid/11-segment-id.geocourse.json",
+      "valid": false,
+      "rule": 11,
+      "code": "R11",
+      "message": "segment has no id",
+      "description": "A segment without an id."
+    },
+    {
+      "file": "invalid/12-loop-elevation.geocourse.json",
+      "valid": false,
+      "rule": 12,
+      "code": "R12",
+      "message": "first and last elevation samples differ",
+      "description": "The stadium loop ends 0.1 m higher than it starts."
+    },
+    {
+      "file": "invalid/13-required-extension.geocourse.json",
+      "valid": false,
+      "rule": 13,
+      "code": "R13",
+      "message": "required extension \"acme_wind\" is not in extensionsUsed",
+      "description": "extensionsRequired names an extension missing from extensionsUsed."
+    },
+    {
+      "file": "invalid/14-attribution.geocourse.json",
+      "valid": false,
+      "rule": 14,
+      "code": "R14",
+      "message": "requires attribution",
+      "description": "OpenStreetMap data (ODbL-1.0) with no attribution."
+    }
+  ]
+}

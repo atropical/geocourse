@@ -1,0 +1,15 @@
+{
+  "registry": "range-types",
+  "format": "0.1",
+  "description": "Range types (spec 5). Core types have no vendor prefix; extension types are written vendor:name.",
+  "entries": [
+    { "name": "surface", "since": "0.1", "spec": "5.2", "status": "core" },
+    { "name": "road", "since": "0.1", "spec": "5.3", "status": "core" },
+    { "name": "bend", "since": "0.1", "spec": "5.4", "status": "core" },
+    { "name": "climb", "since": "0.1", "spec": "5.5", "status": "core" },
+    { "name": "segment", "since": "0.1", "spec": "5.6", "status": "core" },
+    { "name": "structure", "since": "0.1", "spec": "5.7", "status": "core" },
+    { "name": "hazard", "since": "0.1", "spec": "5.8", "status": "core" },
+    { "name": "marker", "since": "0.1", "spec": "5.9", "status": "core" }
+  ]
+}

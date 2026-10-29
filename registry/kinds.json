@@ -1,0 +1,24 @@
+{
+  "registry": "kinds",
+  "format": "0.1",
+  "description": "kind values per range type (spec 5.7 to 5.9). Extension values are written vendor:name.",
+  "entries": [
+    { "type": "structure", "kind": "bridge", "since": "0.1", "osm": "bridge=yes" },
+    { "type": "structure", "kind": "tunnel", "since": "0.1", "osm": "tunnel=yes" },
+    { "type": "structure", "kind": "building_passage", "since": "0.1", "osm": "tunnel=building_passage" },
+    { "type": "hazard", "kind": "cattle_grid", "since": "0.1", "osm": "barrier=cattle_grid" },
+    { "type": "hazard", "kind": "speed_bump", "since": "0.1", "osm": "traffic_calming=bump" },
+    { "type": "hazard", "kind": "railway_crossing", "since": "0.1", "osm": "railway=level_crossing" },
+    { "type": "hazard", "kind": "ford", "since": "0.1", "osm": "ford=yes" },
+    { "type": "hazard", "kind": "gate", "since": "0.1", "osm": "barrier=gate" },
+    { "type": "marker", "kind": "start", "since": "0.1" },
+    { "type": "marker", "kind": "finish", "since": "0.1" },
+    { "type": "marker", "kind": "summit", "since": "0.1", "osm": "natural=peak" },
+    { "type": "marker", "kind": "sprint", "since": "0.1" },
+    { "type": "marker", "kind": "feed", "since": "0.1" },
+    { "type": "marker", "kind": "town", "since": "0.1", "osm": "place=town, place=village" },
+    { "type": "marker", "kind": "viewpoint", "since": "0.1" },
+    { "type": "marker", "kind": "sign", "since": "0.1" },
+    { "type": "marker", "kind": "info", "since": "0.1" }
+  ]
+}
