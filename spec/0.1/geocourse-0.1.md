@@ -157,7 +157,7 @@ Width lets a reader draw the road at the right size, keep riders on it, and judg
 
 ### 5.4 `bend`
 
-`radius` MUST (m, at the tightest point, > 0), `direction` MUST (`"left"` or `"right"`), `apex` MUST (d of the tightest point, within the range).
+`radius` MUST (m, at the tightest point, > 0), `direction` MUST (`"left"` or `"right"`), `apex` MUST (d of the tightest point, within the range; where the radius stays within 1 % of its minimum over a stretch, as on a constant-radius arc, the middle of that stretch).
 
 - **Measuring.** Resample the geometry at 1 m. Radius at d is r = 20 m ÷ |Δψ|, where Δψ is the change in heading in radians, unwrapped, between d − 10 m and d + 10 m. Every writer then measures the same bend the same way.
 - **Why a 20 m window.** It averages out mapping noise and still reads real bends: a 2° wobble on a straight reads as about 570 m (not a bend), a 90° junction drawn as one sharp OSM corner reads as about 13 m (close to a real junction), and hairpins read true down to about 7 m radius. Tighter hairpins read slightly wide; a 5 m hairpin reads about 6.4 m.
@@ -241,7 +241,7 @@ A file is valid only when all of these hold. A JSON Schema (https://geocourse.or
 7. Surface ranges cover [0, `length`] exactly, with no gaps or overlaps; `crr` ≥ 0, `grip` > 0.
 8. Geometry length agrees with d within max(1 m, 0.5 %) at every sample.
 9. When `grade` is present, its integral matches the elevation change within 2 m over every 1 km window.
-10. Bends have `radius` > 0 and `apex` inside the range, and do not overlap; with `bendRadiusLimit` set, none is missing.
+10. Bends have `radius` > 0 and `apex` inside the range, and do not overlap; with `bendRadiusLimit` set, none is missing: every measured bend has a listed bend in the same direction whose apex lies within the measured stretch, give or take 1 m.
 11. Every `segment` has an `id`.
 12. On a closed course the first and last elevation samples are equal, and the first and last geometry positions are within 1 m.
 13. Every name in `extensionsRequired` is also in `extensionsUsed`.
@@ -311,7 +311,7 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 **Out of scope for the core spec**
 
 - Storage, access control and distribution (buckets, keys, signed links, server endpoints).
-- The rider physics model and game rules (crashes, braking input, drafting). The model on the first tab can become an informative appendix, so apps have a shared starting point without it being mandatory.
+- The rider physics model and game rules (crashes, braking input, drafting). A reference physics model can become an informative appendix, so apps have a shared starting point without it being mandatory.
 - Assistive features: slow-down cues, brake points, racing line. Readers compute them, as racing games do, from geometry, `width`, bends and surface; the file only supplies those inputs.
 - Scenery and tiles. A companion spec can define them later and point at a course by `id` and `version`; until then they ride in extensions.
 - Branching routes. One file is one path.
@@ -330,7 +330,7 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 **Open questions**
 
 - [ ] **Name.** GeoCourse. A web search found no clashing format or app; a formal trademark check is still due before 1.0.
-- [ ] **Horizontal distance.** The reference writer already measures distance horizontally and treats grade as rise over run, which matches section 2. Checked (2026-10-30): the app advances distance by v · dt (virtualRide.ts), not v · cos θ · dt, so it needs the fix. The first over-counts distance by 0.3 % at 8 % and 2 % at 20 %.
+- [x] **Horizontal distance.** The reference writer already measures distance horizontally and treats grade as rise over run, which matches section 2. Readers that move a rider at ground speed v advance d by v · cos θ per second (section 2); advancing by v over-counts distance by 0.3 % at 8 % and 2 % at 20 %.
 
 ### Findings from the first export (Frost Gate Traverse, 2026-10-30)
 
@@ -339,7 +339,7 @@ The reference writer's first export is valid under every rule of section 8: 75.6
 - [ ] **Size.** Geometry at 2 m is 77 % of the file (582 KB, 234 KB gzip). Consider delta-encoding positions, or a step that may grow on straights.
 - [ ] **Bend window at the ends.** 5.4 doesn't say what happens within 10 m of the start or end of an open course. The writer clamps the window and divides by the shorter span; say so, or say the bend ends there.
 - [ ] **S-bends.** A stretch under the limit can turn left, then right, with no straight between. The writer splits it where the turn changes sign; the spec should say that.
-- [ ] **"None missing" needs a tolerance.** The validator recomputes bends from the geometry and accepts a listed bend within 1 m of each measured apex. Say how close is close enough, or validators will disagree.
+- [x] **"None missing" needs a tolerance.** The validator recomputes bends from the geometry and accepts a listed bend within 1 m of each measured apex. Say how close is close enough, or validators will disagree.
 - [ ] **1 km windows in rule 9.** Say whether a window slides by one sample, and what a course shorter than 1 km checks (the writer uses the whole course).
 - [ ] **Heading rounding.** 359.96° at scale 0.1 rounds to 3600, outside [0, 360). Writers must wrap it to 0; say so in 4.2.
 - [ ] **Rule 14.** "Requires attribution" needs a list; the validator assumes ODbL and CC-BY.

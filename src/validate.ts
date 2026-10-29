@@ -30,6 +30,8 @@ export const TOLERANCE = {
   quotient: 1e-9,
   /** Metres. A listed bend matches a measured stretch when its apex lies inside the stretch widened by this much. */
   apex: 1,
+  /** Points. Bend completeness is not checked above this many 1 m resample points (10 000 km). */
+  maxResample: 10_000_000,
 } as const;
 
 const CORE_TYPES = new Set(["surface", "road", "bend", "climb", "segment", "structure", "hazard", "marker"]);
@@ -429,6 +431,10 @@ class Validator {
       if (this.c.geometry === undefined) this.warn("R10", "/profile/bendRadiusLimit", "bend completeness not checked: the file has no geometry");
       return;
     }
+    if (this.length > TOLERANCE.maxResample) {
+      this.warn("R10", "/length", `bend completeness not checked: length over ${TOLERANCE.maxResample} m`);
+      return;
+    }
     for (const m of measureBends(this.points(), (this.c.geometry as Obj).frame as string, (this.c.geometry as Obj).step as number, this.length, this.closed, limit)) {
       const found = bends.some((b) => b.props.direction === m.direction && isNum(b.props.apex) && this.inStretch(b.props.apex, m));
       if (!found) this.err(10, "/ranges", `missing ${m.direction} bend from ${m.from} to ${m.to} m (radius ${m.radius.toFixed(1)} m at ${m.apex} m)`);
@@ -534,7 +540,7 @@ export interface MeasuredBend {
   direction: "left" | "right";
   from: number;
   to: number;
-  /** Smallest measured radius, and the first d where it occurs. */
+  /** Smallest measured radius, and the apex as spec 5.4 defines it: the middle of the run within 1 % of that radius. */
   radius: number;
   apex: number;
 }
@@ -613,8 +619,8 @@ export function measureBends(
   if (closed) {
     const free = r.findIndex((_, k) => !inBend(k));
     if (free < 0) {
-      const rmin = Math.min(...r);
-      return [{ direction: sign[0] > 0 ? "right" : "left", from: 0, to: length, radius: rmin, apex: ds[r.indexOf(rmin)] }];
+      const kmin = r.reduce((a, x, k) => (x < r[a] ? k : a), 0);
+      return [{ direction: sign[0] > 0 ? "right" : "left", from: 0, to: length, radius: r[kmin], apex: ds[kmin] }];
     }
     start = free;
   }
@@ -644,6 +650,13 @@ export function measureBends(
   }
   return joined.map(({ dir, ks }) => {
     const kmin = ks.reduce((a, k) => (r[k] < r[a] ? k : a), ks[0]);
-    return { direction: dir > 0 ? "right" : "left", from: ds[ks[0]], to: ds[ks[ks.length - 1]], radius: r[kmin], apex: ds[kmin] };
+    // The run around the minimum where r stays within 1 %, and its middle.
+    const at = ks.indexOf(kmin);
+    let lo = at, hi = at;
+    while (lo > 0 && r[ks[lo - 1]] <= r[kmin] * 1.01) lo--;
+    while (hi < ks.length - 1 && r[ks[hi + 1]] <= r[kmin] * 1.01) hi++;
+    const span = (ds[ks[hi]] - ds[ks[lo]] + (closed ? length : 0)) % (closed ? length : Infinity);
+    const mid = (ds[ks[lo]] + span / 2) % length;
+    return { direction: dir > 0 ? "right" : "left", from: ds[ks[0]], to: ds[ks[ks.length - 1]], radius: r[kmin], apex: Math.round(mid * 100) / 100 };
   });
 }

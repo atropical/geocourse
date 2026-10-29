@@ -29,11 +29,11 @@ Section 8 alone decides validity, so spec text outside it is reported as warning
 
 ## Where the spec leaves a choice open
 
-These follow the reference writer or the open questions in section 10 of the spec. They will move into the spec as it settles.
+Rule 10's "none is missing" follows the spec: every measured bend needs a listed bend in the same direction whose apex lies within the measured stretch, give or take 1 m. The rest follow the reference writer or the open questions in section 10 of the spec. They will move into the spec as it settles.
 
 - **Sample counts.** ceil(`length` / step) treats a quotient within 1 part in 10⁹ of a whole number as that number, so 0.3 / 0.1 counts as 3, not 4.
 - **Distances.** Geodesic on the WGS 84 ellipsoid (spec 2), by Vincenty's inverse formula. For the rare nearly antipodal pair where Vincenty does not converge it falls back to a great-circle distance on a sphere of the ellipsoid's mean radius. Equality of distances allows 10⁻⁶ m.
 - **Rule 9 windows.** A 1 km window starts at every profile sample and slides by one sample. A course of 1 km or less checks the whole course as one window. Windows do not wrap on a closed course.
 - **Rule 10 measuring.** As spec 5.4: geometry resampled at 1 m by d, heading change between the tangents at d − 10 m and d + 10 m. Within 10 m of the ends of an open course the window is clamped and divided by the shorter span. A stretch is split where the turn changes sign. Same-direction stretches less than 10 m apart are joined.
-- **Rule 10 "none is missing".** Each measured stretch needs a listed bend in the same direction whose `apex` lies inside the stretch, widened by 1 m at each end. Matching the apex to within 1 m of the measured tightest point does not work: on an arc of constant radius, centimetre rounding moves the tightest point anywhere along the arc.
+- **Size limit.** Bend completeness is skipped, with a warning, on courses over 10 000 km, so a tiny file cannot force a huge resample.
 - **Rule 14.** The attribution list is [`registry/attribution-licences.json`](../registry/attribution-licences.json). Only `sources[].licence` is checked.
