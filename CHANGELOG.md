@@ -8,6 +8,7 @@ Spec, schema and validator versions. Dates are UTC.
 - Spec 0.1 re-converted from doc rev 58: bend window clamped at the ends of an open course and wrapping on a loop, S-bends split where the direction changes, rule 9 windows defined, headings that round to 360° stored as 0, no finish marker on a closed course (rule 15, rev 59), `widthSource` `"design"`, drafts may change until released.
 - Schema 0.1: `widthSource` accepts `"design"`.
 - Validator: rule 15, a finish marker on a closed course; measured apex as 5.4 defines it; bend completeness skipped above 10 000 km.
+- Spec 0.1 section 10: multi-stage events are out of scope for the core spec. The spec text is now maintained in this repo.
 - Tests: valid S-bend and bend-at-start courses; invalid heading of 3600 (rule 5) and finish on a loop.
 
 ## Draft 0.1 — 2026-10-30
