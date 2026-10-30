@@ -316,7 +316,6 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 - Assistive features: slow-down cues, brake points, racing line. Readers compute them, as racing games do, from geometry, `width`, bends and surface; the file only supplies those inputs.
 - Scenery and tiles. A companion spec can define them later and point at a course by `id` and `version`; until then they ride in extensions.
 - Branching routes. One file is one path.
-- Multi-stage events. A companion spec can list courses in order by `id` and `version`; a course file carries no stage links.
 
 **Changes from the current format 0** (for files written before this draft)
 
