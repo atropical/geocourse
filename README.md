@@ -30,7 +30,7 @@ GeoCourse puts the road into the file. Everything is placed by distance along th
 
 ## Status
 
-**Proposed open standard, draft 0.1, open for comment.** While the major version is 0, any release may break. GeoCourse becomes a stable 1.0 only after two independent implementations ride the same test files with the same results and a public comment period has closed. No standards body has endorsed it; see [Contributing](CONTRIBUTING.md#process) for how it is run.
+**Proposed open standard, draft 0.1, open for comment.** While the major version is 0, any release may break. No standards body has endorsed it; see [Contributing](CONTRIBUTING.md#process) for how it is run.
 
 ## Implementations
 
@@ -40,7 +40,7 @@ GeoCourse puts the road into the file. Everything is placed by distance along th
 | Strōq World Studio | Writer | Course editor; exports GeoCourse files |
 | [Reference validator](src/README.md) | Validator | In this repository |
 
-Strōq started GeoCourse and both Strōq entries come from the same maker, so they count as one implementation for 1.0. To add yours, open an issue or a pull request against this table with the name, role (reader, writer or both), a link, and the spec version it follows.
+To add yours, open an issue or a pull request against this table with the name, role (reader, writer or both), a link, and the spec version it follows.
 
 ## Contents
 

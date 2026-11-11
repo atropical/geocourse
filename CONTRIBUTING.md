@@ -27,12 +27,6 @@ GeoCourse is a **proposed open standard**: a public draft, free to implement, th
 
 **Versions.** The spec uses semantic versioning. Before 1.0, any minor version may break. From 1.0 on, a minor version only adds things a reader may ignore, a patch only fixes wording, and anything that breaks a file or a reader needs a new major version.
 
-**Path to 1.0.** The format is declared stable 1.0 when all of these hold:
-
-- at least two independent implementations (from different makers) read the same test files and get the same results;
-- a public comment period of at least 60 days has run on the release candidate, announced on the site;
-- every open issue against the candidate is resolved or deferred, with the reason recorded.
-
 **Implementations.** List yours in the [Implementations table](README.md#implementations) by issue or pull request.
 
 ## Develop

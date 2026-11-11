@@ -1,7 +1,7 @@
 # GeoCourse specification, draft 0.1
 
 - **Version:** 0.1 (draft)
-- **Status:** Proposed open standard, draft for comment. Not yet stable; any 0.x release may break. Stable 1.0 needs two independent implementations and a public comment period ([process](../../CONTRIBUTING.md#process)).
+- **Status:** Proposed open standard, draft for comment. Not yet stable; any 0.x release may break. How it changes: [process](../../CONTRIBUTING.md#process).
 - **This version:** https://geocourse.org/spec/0.1/
 - **Latest version:** https://geocourse.org/spec/
 - **Maintainer:** Atropical
