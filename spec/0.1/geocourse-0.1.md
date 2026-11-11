@@ -1,5 +1,15 @@
 # GeoCourse specification, draft 0.1
 
+- **Version:** 0.1 (draft)
+- **Status:** Proposed open standard, draft for comment. Not yet stable; any 0.x release may break. Stable 1.0 needs two independent implementations and a public comment period ([process](../../CONTRIBUTING.md#process)).
+- **This version:** https://geocourse.org/spec/0.1/
+- **Latest version:** https://geocourse.org/spec/
+- **Maintainer:** Atropical
+- **Licence:** this text CC BY 4.0 ([`spec/LICENSE`](../LICENSE)); schema and validator Apache-2.0; test files and registry CC0 1.0. Implementing GeoCourse is royalty-free.
+- **Feedback:** issues at https://geocourse.org/feedback/; changes go issue first, then pull request ([Contributing](../../CONTRIBUTING.md))
+
+GeoCourse was started by Strōq and is owned by no single app. It is free for any app, trainer or tool to implement.
+
 ## 1. Introduction
 
 GeoCourse is a JSON format for one rideable cycling course: the route, its elevation, and the road along it (surface, width, bends, structures, climbs and markers). Any indoor-cycling app, trainer, route planner or editor can read and write it. It is small, self-describing and simple to parse.

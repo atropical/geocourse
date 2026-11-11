@@ -1,6 +1,20 @@
 # GeoCourse
 
-GeoCourse is an open JSON format for one rideable cycling course: the route, its elevation, and the road along it — surface, width, bends, structures, climbs and markers — with the physics values a simulator needs. Any indoor-cycling app, smart trainer, route planner or editor can read and write it.
+GeoCourse is a proposed open standard for cycling courses: road, height, surface and scenery in one file. It is free to implement, and no app owns it.
+
+| | |
+|---|---|
+| **Title** | GeoCourse: a format for rideable cycling courses |
+| **Version** | 0.1 (draft) |
+| **Status** | Proposed open standard, draft for comment |
+| **This version** | https://geocourse.org/spec/0.1/ |
+| **Latest version** | https://geocourse.org/spec/ |
+| **Maintainer** | Atropical, which makes Strōq |
+| **Licence** | Spec CC BY 4.0; schema and tools Apache-2.0; test files and registry CC0 1.0. Implementing it is royalty-free. |
+| **Feedback** | Issues at https://geocourse.org/feedback/ |
+| **Changes** | Proposed by issue, then pull request; see [Contributing](CONTRIBUTING.md#process) |
+
+GeoCourse is a JSON format for one rideable cycling course: the route, its elevation, and the road along it — surface, width, bends, structures, climbs and markers — with the physics values a simulator needs. Any indoor-cycling app, smart trainer, route planner or editor can read and write it.
 
 ## Why
 
@@ -16,7 +30,17 @@ GeoCourse puts the road into the file. Everything is placed by distance along th
 
 ## Status
 
-**Draft 0.1.** While the major version is 0, any release may break. Format 1.0 locks once two independent apps ride the same test files and get the same results.
+**Proposed open standard, draft 0.1, open for comment.** While the major version is 0, any release may break. GeoCourse becomes a stable 1.0 only after two independent implementations ride the same test files with the same results and a public comment period has closed. No standards body has endorsed it; see [Contributing](CONTRIBUTING.md#process) for how it is run.
+
+## Implementations
+
+| Implementation | Role | Notes |
+|---|---|---|
+| Strōq app | Reader | Rides GeoCourse files indoors, with grade, surface and bends driving the trainer |
+| Strōq World Studio | Writer | Course editor; exports GeoCourse files |
+| [Reference validator](src/README.md) | Validator | In this repository |
+
+Strōq started GeoCourse and both Strōq entries come from the same maker, so they count as one implementation for 1.0. To add yours, open an issue or a pull request against this table with the name, role (reader, writer or both), a link, and the spec version it follows.
 
 ## Contents
 
@@ -49,6 +73,7 @@ Linked or installed as a package, the same command is `geocourse-validate my-cou
 - Registry and name requests: https://geocourse.org/registry/
 - Test files: https://geocourse.org/tests/0.1/
 - Source: https://geocourse.org/source/
+- Feedback and change proposals: https://geocourse.org/feedback/
 - [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 ## Licence
@@ -59,4 +84,4 @@ Full texts: [`spec/LICENSE`](spec/LICENSE) (CC BY 4.0), [`LICENSE`](LICENSE) (Ap
 
 ## Origin
 
-GeoCourse was started by Strōq, whose Studio is the first reference writer. Hosted by Atropical.
+Strōq started GeoCourse and uses it, but no app owns it. Atropical maintains the repository and the site until there are enough implementers to share that work.

@@ -17,6 +17,24 @@ Thanks for helping. GeoCourse is a draft, so questions and real-world files are 
 - Every source file starts with an SPDX licence header.
 - Add a line to [`CHANGELOG.md`](CHANGELOG.md) under "Unreleased".
 
+## Process
+
+GeoCourse is a **proposed open standard**: a public draft, free to implement, that anyone can comment on and change through the steps below. It is not run by a standards body, and none has endorsed it.
+
+1. **Issue.** Every change to the spec, schema or registry starts as an issue at https://geocourse.org/feedback/.
+2. **Agreement.** Normative changes need agreement in the issue before a pull request. The maintainer (Atropical) decides when there is no agreement, and says why in the issue.
+3. **Pull request.** The change, its test files and a changelog line, linked to the issue.
+
+**Versions.** The spec uses semantic versioning. Before 1.0, any minor version may break. From 1.0 on, a minor version only adds things a reader may ignore, a patch only fixes wording, and anything that breaks a file or a reader needs a new major version.
+
+**Path to 1.0.** The format is declared stable 1.0 when all of these hold:
+
+- at least two independent implementations (from different makers) read the same test files and get the same results;
+- a public comment period of at least 60 days has run on the release candidate, announced on the site;
+- every open issue against the candidate is resolved or deferred, with the reason recorded.
+
+**Implementations.** List yours in the [Implementations table](README.md#implementations) by issue or pull request.
+
 ## Develop
 
 ```sh
