@@ -4,6 +4,7 @@ Spec, schema and validator versions. Dates are UTC.
 
 ## Unreleased
 
+- GeoCourse presented as a proposed open standard: status block on the home page and spec, process and path to 1.0 in Contributing, an Implementations list, and a /feedback/ link to issues.
 - Pending: Frost Gate Traverse added to `tests/0.1/valid/`.
 - Spec 0.1 re-converted from doc rev 58: bend window clamped at the ends of an open course and wrapping on a loop, S-bends split where the direction changes, rule 9 windows defined, headings that round to 360° stored as 0, no finish marker on a closed course (rule 15, rev 59), `widthSource` `"design"`, drafts may change until released.
 - Schema 0.1: `widthSource` accepts `"design"`.

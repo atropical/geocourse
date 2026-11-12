@@ -2,7 +2,7 @@
 
 // Builds the static site for geocourse.org into _site/. Run with
 // `npm run site`. Pages are rendered from the Markdown and JSON in the repo;
-// the source repository address appears only in the /source/ and /request/
+// the source repository address appears only in the /source/, /request/ and /feedback/
 // redirects, so the site never depends on where the source is hosted.
 
 import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -12,6 +12,7 @@ import { Marked } from "marked";
 /** The only place the source host is named. Change it here if the repository moves. */
 const SOURCE = "https://github.com/atropical/geocourse";
 const REQUEST = `${SOURCE}/issues/new?template=registry-name.yml`;
+const FEEDBACK = `${SOURCE}/issues`;
 
 const root = process.cwd();
 const out = join(root, "_site");
@@ -84,7 +85,7 @@ function page(path: string, title: string, body: string) {
 <main>
 ${body}
 </main>
-<footer>GeoCourse draft 0.1 · <a href="/source/">Source</a> · <a href="/contributing/">Contributing</a> · <a href="/changelog/">Changelog</a> · Spec <a href="/spec/LICENSE.txt">CC BY 4.0</a>, schema and tools <a href="/LICENSE.txt">Apache-2.0</a>, test files and registry <a href="/tests/LICENSE.txt">CC0</a></footer>
+<footer>GeoCourse 0.1, proposed open standard (draft for comment) · <a href="/feedback/">Feedback</a> · <a href="/source/">Source</a> · <a href="/contributing/">Contributing</a> · <a href="/changelog/">Changelog</a> · Spec <a href="/spec/LICENSE.txt">CC BY 4.0</a>, schema and tools <a href="/LICENSE.txt">Apache-2.0</a>, test files and registry <a href="/tests/LICENSE.txt">CC0</a></footer>
 </body>
 </html>
 `;
@@ -107,7 +108,7 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 // Home.
-page("/", "GeoCourse: an open format for rideable cycling courses", render(read("README.md"), "README.md"));
+page("/", "GeoCourse: a proposed open standard for cycling courses", render(read("README.md"), "README.md"));
 
 // Spec.
 page("/spec/0.1/", "GeoCourse specification, draft 0.1", render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md"));
@@ -163,6 +164,7 @@ page("/changelog/", "GeoCourse changelog", render(read("CHANGELOG.md"), "CHANGEL
 copyFileSync(join(root, "LICENSE"), join(out, "LICENSE.txt"));
 copyFileSync(join(root, "spec/LICENSE"), join(out, "spec/LICENSE.txt"));
 redirect("/source/", SOURCE);
+redirect("/feedback/", FEEDBACK);
 page("/404.html", "Not found", `<h1 id="not-found">Not found</h1><p>Try the <a href="/">home page</a> or the <a href="/spec/0.1/">spec</a>.</p>`);
 copyFileSync(join(root, "site/style.css"), join(out, "style.css"));
 copyFileSync(join(root, "CNAME"), join(out, "CNAME"));
