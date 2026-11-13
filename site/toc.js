@@ -1,6 +1,20 @@
 // SPDX-License-Identifier: Apache-2.0
 // Contents menu on spec pages: highlights the section in view; a toggle on narrow screens.
 (() => {
+  // Heading anchors: clicking copies the link and updates the address.
+  for (const a of document.querySelectorAll("a.anchor")) {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      history.replaceState(null, "", a.hash);
+      a.closest("h1,h2,h3,h4,h5,h6")?.scrollIntoView();
+      navigator.clipboard?.writeText(location.href).then(() => {
+        a.classList.add("copied");
+        setTimeout(() => a.classList.remove("copied"), 1200);
+      }, () => {});
+    });
+  }
+})();
+(() => {
   const nav = document.querySelector(".toc");
   if (!nav) return;
   const button = nav.querySelector(".toc-toggle");
@@ -27,7 +41,6 @@
     current = a;
     if (a && !narrow.matches) a.scrollIntoView({ block: "nearest" });
   };
-  let queued = false;
-  addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } }, { passive: true });
+  addEventListener("scroll", update, { passive: true });
   update();
 })();
