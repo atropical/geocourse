@@ -27,7 +27,6 @@
     current = a;
     if (a && !narrow.matches) a.scrollIntoView({ block: "nearest" });
   };
-  let queued = false;
-  addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } }, { passive: true });
+  addEventListener("scroll", update, { passive: true });
   update();
 })();

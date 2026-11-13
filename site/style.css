@@ -49,3 +49,5 @@ main:has(.spec-layout) { max-width: 70rem; }
   .toc-toggle:not([hidden]) + ol { display: none; }
   .toc.open > ol { display: block; max-height: 70vh; overflow-y: auto; padding-top: .5rem; }
 }
+body:has(.spec-layout) header, body:has(.spec-layout) footer { max-width: 70rem; }
+main a, main code { overflow-wrap: anywhere; }
