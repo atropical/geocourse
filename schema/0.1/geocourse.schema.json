@@ -15,6 +15,16 @@
     "description": { "type": "string" },
     "length": { "type": "number", "exclusiveMinimum": 0 },
     "closed": { "type": "boolean" },
+    "laps": { "type": "integer", "minimum": 1, "description": "Closed courses only (rule 16)" },
+    "roadRules": {
+      "type": "object",
+      "required": ["driveSide"],
+      "properties": {
+        "driveSide": { "enum": ["left", "right"] },
+        "signs": { "type": "string", "pattern": "^([a-z0-9_]+|[a-z0-9]+:[a-z0-9_]+)$" },
+        "markings": { "type": "string", "pattern": "^([A-Z]{2}|[a-z0-9_]+|[a-z0-9]+:[a-z0-9_]+)$" }
+      }
+    },
     "created": { "$ref": "#/$defs/timestamp" },
     "authors": { "type": "array", "items": { "type": "string" } },
     "licence": { "type": "string" },

@@ -171,6 +171,11 @@ const cases: Case[] = [
   { file: "valid/s-bend.geocourse.json", valid: true, description: "A left bend straight into a right bend, listed as two bends split where the direction changes.", course: sBend },
   { file: "valid/bend-at-start.geocourse.json", valid: true, description: "An open course that starts on a bend, measured with the window clamped at the start.", course: clamped },
   {
+    file: "valid/stadium-laps.geocourse.json", valid: true,
+    description: "The stadium loop ridden as 3 laps, with left-hand traffic, Vienna Convention signs and UK markings.",
+    course: mutate(loop, (c) => { c.id = "test-stadium-laps"; c.laps = 3; c.roadRules = { driveSide: "left", signs: "vienna", markings: "GB" }; }),
+  },
+  {
     file: "invalid/01-type.geocourse.json", valid: false, rule: 1, message: 'type must be "Course"',
     description: 'type is "course", not "Course".', course: mutate(example, (c) => { c.type = "course"; }),
   },
@@ -248,6 +253,21 @@ const cases: Case[] = [
     description: "The stadium loop with a finish marker; a closed course has none.",
     course: mutate(loop, (c) => { c.ranges.push({ type: "marker", from: 0, to: 0, properties: { kind: "finish" } }); }),
   },
+  {
+    file: "invalid/16-laps-open.geocourse.json", valid: false, rule: 16, message: "laps is only allowed on a closed course",
+    description: "An open course with a lap count.",
+    course: mutate(example, (c) => { c.laps = 2; }),
+  },
+  {
+    file: "invalid/16-laps-zero.geocourse.json", valid: false, rule: 16, message: "laps must be an integer of 1 or more",
+    description: "The stadium loop with 0 laps.",
+    course: mutate(loop, (c) => { c.laps = 0; }),
+  },
+  {
+    file: "invalid/17-drive-side.geocourse.json", valid: false, rule: 17, message: 'driveSide must be "left" or "right"',
+    description: "roadRules.driveSide is \"centre\".",
+    course: mutate(example, (c) => { c.roadRules = { driveSide: "centre" }; }),
+  },
 ];
 
 rmSync(join(out, "valid"), { recursive: true, force: true });
@@ -258,7 +278,7 @@ for (const c of cases) writeFileSync(join(out, c.file), c.text ?? format(c.cours
 
 const manifest = {
   format: "0.1",
-  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R15, the rules of section 8); message is a substring of the reference validator's error.",
+  description: "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R17, the rules of section 8); message is a substring of the reference validator's error.",
   pending: [{ file: "valid/frost-gate-traverse.geocourse.json", description: "Frost Gate Traverse, 75.6 km: first export from the reference writer, to be added." }],
   tests: cases.map(({ file, valid, rule, code, message, description }) => ({ file, valid, ...(valid ? {} : { ...(rule ? { rule } : {}), code: code ?? `R${rule}`, message }), description })),
 };

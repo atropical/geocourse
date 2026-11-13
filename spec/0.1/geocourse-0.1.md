@@ -55,6 +55,8 @@ The root of every file. Members not listed here MUST be ignored by readers (sect
 | `description` | string | MAY | Plain text |
 | `length` | number | MUST | Metres, greater than 0 |
 | `closed` | boolean | MUST | True for a loop |
+| `laps` | integer | MAY | Closed courses only: how many laps the course is ridden, 1 or more |
+| `roadRules` | Road rules | MAY | Which side traffic keeps to, and the sign and marking standards of the road |
 | `created` | string | MAY | RFC 3339 |
 | `authors` | array of string | MAY | People or organisations |
 | `licence` | string | SHOULD | SPDX identifier, for example `"ODbL-1.0"` |
@@ -68,6 +70,10 @@ The root of every file. Members not listed here MUST be ignored by readers (sect
 | `extensionsUsed`, `extensionsRequired`, `extensions` |  | MAY | Section 7 |
 
 **Source.** `{ "kind": "geometry" | "elevation" | "road", "name": string, "licence": SPDX string, "url"?: string, "retrieved"?: RFC 3339 }`. Example: elevation from Copernicus GLO-30, road data from OpenStreetMap.
+
+**Laps.** On a closed course, `laps` is the number of times the course is ridden as published: the ride is `laps` × `length`. When absent, the number of laps is up to the reader, as before. An open course MUST NOT carry `laps`. A reader MAY let the rider choose another count; `laps` is the course's own. Segments and markers repeat on every lap.
+
+**Road rules.** `{ "driveSide": "left" | "right", "signs"?: string, "markings"?: string }`. Information about the road, not drawing instructions: which side traffic keeps to, and which standards its signs and markings follow, so a reader can draw, warn or place riders consistently with the real road. `driveSide` MUST. `signs` is a sign-standard id from the registry, for example `vienna` or `mutcd`. `markings` is a registry id, or an ISO 3166-1 alpha-2 country code in upper case (`GB`, `NO`, `US`) for that country's national marking rules. Extension values are `vendor:name`. A reader that doesn't know a value ignores it. Road rules have no physics effect.
 
 **Summary.** Readers SHOULD recompute rather than trust it. When given, `elevationGain` MUST equal the sum of positive differences between consecutive elevation samples as stored, with no extra smoothing, so every app shows the same number.
 
@@ -192,7 +198,7 @@ A timed stretch for results. Range `id` MUST be present and stay the same across
 
 ### 5.9 `marker`
 
-`kind` MUST: `start`, `finish`, `summit`, `sprint`, `feed`, `town`, `viewpoint`, `sign` or `info`. `name` and `text` MAY. Usually a point. An open course SHOULD have `start` at 0 and `finish` at `length`. A closed course SHOULD have `start` at 0 and MUST NOT have a `finish`: laps, and where a ride ends, are up to the reader.
+`kind` MUST: `start`, `finish`, `summit`, `sprint`, `feed`, `town`, `viewpoint`, `sign` or `info`. `name` and `text` MAY. Usually a point. An open course SHOULD have `start` at 0 and `finish` at `length`. A closed course SHOULD have `start` at 0 and MUST NOT have a `finish`: the lap count is `laps` (section 3), or the reader's when absent, and where a ride ends is up to the reader.
 
 ## 6. OpenStreetMap linking
 
@@ -226,6 +232,14 @@ A range MAY name the OpenStreetMap elements it came from:
 **Extensions** follow the glTF pattern.
 
 - Any object MAY carry `"extensions": { "<name>": { … } }`. Names are lowercase `vendor_feature`, for example `acme_scenery`.
+- Two spellings, never mixed. Extension names (keys of `extensions`, entries of `extensionsUsed` and `extensionsRequired`) use an underscore: `vendor_feature`. Range types and `kind` values defined by an extension use a colon: `vendor:name`.
+
+  | Wrong | Right | Why |
+  |---|---|---|
+  | `"extensions": { "acme:scenery": … }` | `"extensions": { "acme_scenery": … }` | An extension name is `vendor_feature` |
+  | `"extensionsUsed": ["acme:roadSystem"]` | `"extensionsUsed": ["acme_road_system"]` | Same; lowercase, no colon |
+  | `{ "type": "acme_checkpoint" }` | `{ "type": "acme:checkpoint" }` | A range type is `vendor:name` |
+  | `"kind": "acme_cattle_ramp"` | `"kind": "acme:cattle_ramp"` | A `kind` value is `vendor:name` |
 - The root lists every name used in `extensionsUsed`, and the subset a reader must understand in `extensionsRequired`. A reader MUST refuse a file with a required extension it does not support, and MUST otherwise ignore extensions it does not know.
 - Extension range types and `kind` values are written `vendor:name`, for example `acme:checkpoint`. Readers ignore unknown types and treat unknown kinds as plain points or ranges.
 - If an extension changes how a course rides (speed, resistance, grip), it MUST be in `extensionsRequired`. Two apps must never ride the same file differently because one ignored an extension.
@@ -257,6 +271,8 @@ A file is valid only when all of these hold. A JSON Schema (https://geocourse.or
 13. Every name in `extensionsRequired` is also in `extensionsUsed`.
 14. `attribution` is present whenever a source licence is on the registry's attribution list. An unknown licence id is a warning, not an error.
 15. A closed course has no `finish` marker.
+16. `laps`, when present, is an integer of 1 or more, and the course is closed.
+17. `roadRules`, when present, has `driveSide` `"left"` or `"right"`; `signs` is a lowercase id or `vendor:name`, and `markings` the same or an upper-case two-letter country code. An id not in the registry is a warning, not an error.
 
 Test files are published at https://geocourse.org/tests/0.1/: valid files a reader must accept and ride to known results (Frost Gate Traverse among them), and invalid files, one per rule, that a validator must reject.
 
@@ -324,7 +340,7 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 - Storage, access control and distribution (buckets, keys, signed links, server endpoints).
 - The rider physics model and game rules (crashes, braking input, drafting). A reference physics model can become an informative appendix, so apps have a shared starting point without it being mandatory.
 - Assistive features: slow-down cues, brake points, racing line. Readers compute them, as racing games do, from geometry, `width`, bends and surface; the file only supplies those inputs.
-- Scenery and tiles. A companion spec can define them later and point at a course by `id` and `version`; until then they ride in extensions.
+- Scenery. It belongs to a companion spec, GeoCourse Scenery (draft outline at [`spec/scenery-0.1/`](../scenery-0.1/geocourse-scenery-0.1.md)), which points at a course by `id` and `version`. Like OpenStreetMap data against map styles, it says what is where, independent of any renderer: land shape, water, ground cover, objects by kind and position, structures by type and span, and a licence per asset. Meshes, levels of detail, shaders and looks, tiling and streaming are not standardised by either spec: they belong to each app's own scenery package. Course files SHOULD NOT carry scenery in extensions beyond small hints (a tile size, a style name), so the course stays small and its `version` moves only when the road does.
 - Branching routes. One file is one path.
 
 **Changes from the current format 0** (for files written before this draft)
@@ -356,6 +372,18 @@ The reference writer's first export is valid under every rule of section 8: 75.6
 - [x] **Rule 14.** Resolved: the registry's attribution list decides (rule 14).
 - [x] **Finish on a loop.** On a closed course a finish marker at length is the same point as 0. Say whether a loop has a finish marker, and where.
 - [x] **widthSource for designed roads.** A fictional course's width is exact by design: neither osm, survey nor estimated fits. Suggest "design".
+
+### Findings from Lake Volta (2026-11-13)
+
+The reference writer's export of Lake Volta for Strōq World is about 3 MB, of which the course itself is about 180 KB; the rest is scenery carried in extensions.
+
+- [x] **Scenery dwarfs the course.** Terrain samples 1.8 MB, models 0.5 MB, structures 0.6 MB, against 180 KB of course. Resolved: scenery is a companion spec (section 10, out of scope), and course files keep only small hints.
+- [x] **Scenery changes bumped the course version.** Moving a tree made a new course `version`, so any segment times and caches keyed on it looked stale while the road was unchanged. Resolved by the same split: scenery carries its own version and names the course `id` and `version` it fits.
+- [x] **Extension names misspelt.** The writer named extensions `stroq:…` (colon), the spelling for range types and kinds. A validator rejects it. Section 7 now shows wrong against right.
+- [x] **Riding needed nothing beyond the core.** The bike reader (grade, surface, bends, corner speed) and the treadmill reader (grade to incline, laps) worked from core members alone; adapting to each machine is the reader's job, as section 1 intends.
+- [x] **Laps.** A loop course had no way to say it is ridden three times. Added `laps` (section 3, rule 16).
+- [x] **Road rules.** Drawing signs, markings and the side riders keep to needed the road's rule set, which had no core home. Added `roadRules` (section 3, rule 17) as information about the road, not rendering.
+- [x] **Side roads stayed out.** Junctions and side roads were drawn as scenery, not course. One file, one path held up: nothing in riding needed a branch.
 
 ## Appendix A. GPX and FIT (informative)
 

@@ -1,0 +1,14 @@
+{
+  "registry": "road-standards",
+  "format": "0.1",
+  "description": "Identifiers for roadRules.signs and roadRules.markings (spec 3, road rules). markings may also be an ISO 3166-1 alpha-2 country code, upper case, meaning that country's national marking rules. Extension values are written vendor:name.",
+  "entries": [
+    { "kind": "signs", "id": "vienna", "since": "0.1", "name": "Vienna Convention on Road Signs and Signals (1968)" },
+    { "kind": "signs", "id": "mutcd", "since": "0.1", "name": "US Manual on Uniform Traffic Control Devices" },
+    { "kind": "signs", "id": "sadc", "since": "0.1", "name": "SADC Road Traffic Signs Manual" },
+    { "kind": "signs", "id": "japan", "since": "0.1", "name": "Japanese road signs (Order on Road Signs, Lane Lines and Road Markings)" },
+    { "kind": "signs", "id": "australia", "since": "0.1", "name": "Australian Standard AS 1742" },
+    { "kind": "markings", "id": "vienna", "since": "0.1", "name": "Vienna Convention road markings, with the European Agreement supplementing it" },
+    { "kind": "markings", "id": "mutcd", "since": "0.1", "name": "US MUTCD markings" }
+  ]
+}
