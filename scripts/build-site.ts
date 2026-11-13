@@ -71,6 +71,33 @@ const NAV: [string, string][] = [
   ["/tests/0.1/", "Tests"],
 ];
 
+/** Wraps a rendered spec in a layout with a contents menu built from its h2 and h3 ids. */
+function withToc(html: string): string {
+  const items: string[] = [];
+  let open = false;
+  for (const m of html.matchAll(/<h([23]) id="([^"]+)">(.*?)<\/h\1>/g)) {
+    const link = `<a href="#${m[2]}">${m[3].replace(/<[^>]+>/g, "")}</a>`;
+    if (m[1] === "2") {
+      if (open) items.push("</ol></li>");
+      else if (items.length) items.push("</li>");
+      items.push(`<li>${link}`);
+      open = false;
+    } else {
+      if (!open) items.push("<ol>");
+      items.push(`<li>${link}</li>`);
+      open = true;
+    }
+  }
+  if (items.length) items.push(open ? "</ol></li>" : "</li>");
+  return `<div class="spec-layout">
+<nav class="toc" aria-label="Contents"><button type="button" class="toc-toggle" aria-expanded="false" aria-controls="toc-list" hidden>Contents</button><ol id="toc-list">${items.join("")}</ol></nav>
+<div class="spec-body">
+${html}
+</div>
+</div>
+<script src="/toc.js" defer></script>`;
+}
+
 function page(path: string, title: string, body: string) {
   const nav = NAV.map(([href, label]) => `<a href="${href}"${(href === "/" ? path === "/" : path.startsWith(href.replace(/0\.1\/$/, ""))) ? ' aria-current="page"' : ""}>${label}</a>`).join("");
   const html = `<!DOCTYPE html>
@@ -112,10 +139,10 @@ mkdirSync(out, { recursive: true });
 page("/", "GeoCourse: a proposed open standard for cycling courses", render(read("README.md"), "README.md"));
 
 // Spec.
-page("/spec/0.1/", "GeoCourse specification, draft 0.1", render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md"));
+page("/spec/0.1/", "GeoCourse specification, draft 0.1", withToc(render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md")));
 copyFileSync(join(root, "spec/0.1/geocourse-0.1.md"), join(out, "spec/0.1/geocourse-0.1.md"));
 redirect("/spec/", "/spec/0.1/");
-page("/spec/scenery-0.1/", "GeoCourse Scenery, draft 0.1 (outline)", render(read("spec/scenery-0.1/geocourse-scenery-0.1.md"), "spec/scenery-0.1/geocourse-scenery-0.1.md"));
+page("/spec/scenery-0.1/", "GeoCourse Scenery, draft 0.1 (outline)", withToc(render(read("spec/scenery-0.1/geocourse-scenery-0.1.md"), "spec/scenery-0.1/geocourse-scenery-0.1.md")));
 
 // Schema.
 const schemaText = read("schema/0.1/geocourse.schema.json");
@@ -172,6 +199,7 @@ redirect("/source/", SOURCE);
 redirect("/feedback/", FEEDBACK);
 page("/404.html", "Not found", `<h1 id="not-found">Not found</h1><p>Try the <a href="/">home page</a> or the <a href="/spec/0.1/">spec</a>.</p>`);
 copyFileSync(join(root, "site/style.css"), join(out, "style.css"));
+copyFileSync(join(root, "site/toc.js"), join(out, "toc.js"));
 copyFileSync(join(root, "CNAME"), join(out, "CNAME"));
 writeFileSync(join(out, ".nojekyll"), "");
 console.log(`site built in ${out}`);
