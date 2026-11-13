@@ -1,12 +1,6 @@
 {
   "format": "0.1",
   "description": "GeoCourse 0.1 test files. A validator must accept every valid file and reject every invalid one with an error of the given code (R1 to R17, the rules of section 8); message is a substring of the reference validator's error.",
-  "pending": [
-    {
-      "file": "valid/frost-gate-traverse.geocourse.json",
-      "description": "Frost Gate Traverse, 75.6 km: first export from the reference writer, to be added."
-    }
-  ],
   "tests": [
     {
       "file": "valid/example-ramp.geocourse.json",

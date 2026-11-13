@@ -139,7 +139,7 @@ Surface ranges MUST cover [0, `length`] with no gaps and no overlaps. Physics me
 | `tracktype` | MAY | OSM value: `grade1` to `grade5` |
 | `name` | MAY | Display text, for example “Pavé sector 12” |
 
-Typical dry values for road-bike tyres (informative, from the reference writer), with the matching OSM tags:
+Typical dry values for road-bike tyres (informative), with the matching OSM tags:
 
 | Surface | OSM tags | crr | grip |
 |---|---|---|---|
@@ -274,7 +274,7 @@ A file is valid only when all of these hold. A JSON Schema (https://geocourse.or
 16. `laps`, when present, is an integer of 1 or more, and the course is closed.
 17. `roadRules`, when present, has `driveSide` `"left"` or `"right"`; `signs` is a lowercase id or `vendor:name`, and `markings` the same or an upper-case two-letter country code. An id not in the registry is a warning, not an error.
 
-Test files are published at https://geocourse.org/tests/0.1/: valid files a reader must accept and ride to known results (Frost Gate Traverse among them), and invalid files, one per rule, that a validator must reject.
+Test files are published at https://geocourse.org/tests/0.1/: valid files a reader must accept and ride to known results, and invalid files, one per rule, that a validator must reject.
 
 ## 9. Example
 
@@ -356,34 +356,9 @@ No bend ranges: the road is straight, and `bendRadiusLimit` says the list is com
 
 **Open questions**
 
-- [ ] **Name.** GeoCourse. A web search found no clashing format or app; a formal trademark check is still due before 1.0.
-- [x] **Horizontal distance.** The reference writer already measures distance horizontally and treats grade as rise over run, which matches section 2. Readers that move a rider at ground speed v advance d by v · cos θ per second (section 2); advancing by v over-counts distance by 0.3 % at 8 % and 2 % at 20 %.
+Implementers are invited to comment on these through the [feedback](https://geocourse.org/feedback/) issues.
 
-### Findings from the first export (Frost Gate Traverse, 2026-10-30)
-
-The reference writer's first export is valid under every rule of section 8: 75.6 km, 756 KB (289 KB gzip), 816 bends (format 0: 183 KB, 881 bends with an 8 m window).
-
-- [ ] **Size.** Geometry at 2 m is 77 % of the file (582 KB, 234 KB gzip). Consider delta-encoding positions, or a step that may grow on straights.
-- [x] **Bend window at the ends.** 5.4 doesn't say what happens within 10 m of the start or end of an open course. The writer clamps the window and divides by the shorter span; say so, or say the bend ends there.
-- [x] **S-bends.** A stretch under the limit can turn left, then right, with no straight between. The writer splits it where the turn changes sign; the spec should say that.
-- [x] **"None missing" needs a tolerance.** The validator recomputes bends from the geometry and accepts a listed bend within 1 m of each measured apex. Say how close is close enough, or validators will disagree.
-- [x] **1 km windows in rule 9.** Say whether a window slides by one sample, and what a course shorter than 1 km checks (the writer uses the whole course).
-- [x] **Heading rounding.** 359.96° at scale 0.1 rounds to 3600, outside [0, 360). Writers must wrap it to 0; say so in 4.2.
-- [x] **Rule 14.** Resolved: the registry's attribution list decides (rule 14).
-- [x] **Finish on a loop.** On a closed course a finish marker at length is the same point as 0. Say whether a loop has a finish marker, and where.
-- [x] **widthSource for designed roads.** A fictional course's width is exact by design: neither osm, survey nor estimated fits. Suggest "design".
-
-### Findings from Lake Volta (2026-11-13)
-
-The reference writer's export of Lake Volta for Strōq World is about 3 MB, of which the course itself is about 180 KB; the rest is scenery carried in extensions.
-
-- [x] **Scenery dwarfs the course.** Terrain samples 1.8 MB, models 0.5 MB, structures 0.6 MB, against 180 KB of course. Resolved: scenery is a companion spec (section 10, out of scope), and course files keep only small hints.
-- [x] **Scenery changes bumped the course version.** Moving a tree made a new course `version`, so any segment times and caches keyed on it looked stale while the road was unchanged. Resolved by the same split: scenery carries its own version and names the course `id` and `version` it fits.
-- [x] **Extension names misspelt.** The writer named extensions `stroq:…` (colon), the spelling for range types and kinds. A validator rejects it. Section 7 now shows wrong against right.
-- [x] **Riding needed nothing beyond the core.** The bike reader (grade, surface, bends, corner speed) and the treadmill reader (grade to incline, laps) worked from core members alone; adapting to each machine is the reader's job, as section 1 intends.
-- [x] **Laps.** A loop course had no way to say it is ridden three times. Added `laps` (section 3, rule 16).
-- [x] **Road rules.** Drawing signs, markings and the side riders keep to needed the road's rule set, which had no core home. Added `roadRules` (section 3, rule 17) as information about the road, not rendering.
-- [x] **Side roads stayed out.** Junctions and side roads were drawn as scenery, not course. One file, one path held up: nothing in riding needed a branch.
+- **File size.** Should positions be delta-encoded, or may the geometry step grow on straights, to keep long courses small?
 
 ## Appendix A. GPX and FIT (informative)
 

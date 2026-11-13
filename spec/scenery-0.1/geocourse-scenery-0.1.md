@@ -25,10 +25,10 @@ A scenery file names the course it fits by `id` and `version`, and carries its o
 
 ## Out of scope
 
-Meshes, levels of detail, shaders and looks, materials, tiling and streaming. Those belong to each app's own scenery package (Strōq's included) and are not standardised, so two apps may draw the same scenery file very differently.
+Meshes, levels of detail, shaders and looks, materials, tiling and streaming. Those belong to each app's own scenery package and are not standardised, so two apps may draw the same scenery file very differently.
 
 ## Open questions
 
-- [ ] Heightfield encoding: scaled-integer grid as in the course profile, or a tiled raster reference.
-- [ ] Registry of ground-cover classes and object kinds, and how far they follow OSM tags.
-- [ ] Whether objects may also be placed by course distance and offset, not only by position.
+- Heightfield encoding: scaled-integer grid as in the course profile, or a tiled raster reference.
+- Registry of ground-cover classes and object kinds, and how far they follow OSM tags.
+- Whether objects may also be placed by course distance and offset, not only by position.
