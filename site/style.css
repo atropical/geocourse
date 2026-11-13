@@ -51,3 +51,10 @@ main:has(.spec-layout) { max-width: 70rem; }
 }
 body:has(.spec-layout) header, body:has(.spec-layout) footer { max-width: 70rem; }
 main a, main code { overflow-wrap: anywhere; }
+/* Heading link anchors */
+.anchor { margin-left: .4rem; color: var(--muted); text-decoration: none; font-weight: 400; opacity: 0; transition: opacity .15s; }
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, h5:hover .anchor, h6:hover .anchor, .anchor:focus-visible { opacity: 1; }
+.anchor:hover { color: var(--link); }
+.anchor:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.anchor.copied::after { content: " copied"; font-size: .6em; }
+@media (hover: none) { .anchor { opacity: .5; } }

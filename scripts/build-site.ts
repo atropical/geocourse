@@ -94,11 +94,17 @@ function withToc(html: string): string {
 <div class="spec-body">
 ${html}
 </div>
-</div>
-<script src="/toc.js" defer></script>`;
+</div>`;
+}
+
+/** Adds a copyable link anchor to every heading with an id. */
+function withAnchors(html: string): string {
+  return html.replace(/<h([1-6]) id="([^"]+)">(.*?)<\/h\1>/g, (_, d, id, inner) => `<h${d} id="${id}">${inner}<a class="anchor" href="#${id}" aria-label="Link to this section">#</a></h${d}>`);
 }
 
 function page(path: string, title: string, body: string) {
+  if ((body.match(/<h[23] id=/g) ?? []).length >= 2) body = withToc(body);
+  body = withAnchors(body);
   const nav = NAV.map(([href, label]) => `<a href="${href}"${(href === "/" ? path === "/" : path.startsWith(href.replace(/0\.1\/$/, ""))) ? ' aria-current="page"' : ""}>${label}</a>`).join("");
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
@@ -107,6 +113,7 @@ function page(path: string, title: string, body: string) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <link rel="stylesheet" href="/style.css">
+<script src="/toc.js" defer></script>
 </head>
 <body>
 <header><a class="brand" href="/">GeoCourse</a><nav>${nav}</nav></header>
@@ -139,10 +146,10 @@ mkdirSync(out, { recursive: true });
 page("/", "GeoCourse: a proposed open standard for cycling courses", render(read("README.md"), "README.md"));
 
 // Spec.
-page("/spec/0.1/", "GeoCourse specification, draft 0.1", withToc(render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md")));
+page("/spec/0.1/", "GeoCourse specification, draft 0.1", render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md"));
 copyFileSync(join(root, "spec/0.1/geocourse-0.1.md"), join(out, "spec/0.1/geocourse-0.1.md"));
 redirect("/spec/", "/spec/0.1/");
-page("/spec/scenery-0.1/", "GeoCourse Scenery, draft 0.1 (outline)", withToc(render(read("spec/scenery-0.1/geocourse-scenery-0.1.md"), "spec/scenery-0.1/geocourse-scenery-0.1.md")));
+page("/spec/scenery-0.1/", "GeoCourse Scenery, draft 0.1 (outline)", render(read("spec/scenery-0.1/geocourse-scenery-0.1.md"), "spec/scenery-0.1/geocourse-scenery-0.1.md"));
 
 // Schema.
 const schemaText = read("schema/0.1/geocourse.schema.json");
