@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import attributionLicences from "../registry/attribution-licences.json" with { type: "json" };
+import roadStandards from "../registry/road-standards.json" with { type: "json" };
 import { geodesicDistance, localOffset } from "./geodesy.js";
 import { parseIJson } from "./json.js";
 
@@ -10,7 +11,7 @@ export interface Issue {
   severity: Severity;
   /** Rule number in spec section 8, when the issue breaks one. */
   rule?: number;
-  /** "R1" to "R15" for section 8 rules, "encoding" for spec 2, "structure" for the shape of sections 3 to 7, "spec" for other spec text. */
+  /** "R1" to "R17" for section 8 rules, "encoding" for spec 2, "structure" for the shape of sections 3 to 7, "spec" for other spec text. */
   code: string;
   /** JSON Pointer to the offending value. */
   path: string;
@@ -120,6 +121,8 @@ class Validator {
     this.rule12(profileOk, geometryOk);
     this.rule13();
     this.rule14();
+    this.rule16();
+    this.rule17();
     this.otherSpecText(ranges, profileOk);
   }
 
@@ -489,6 +492,30 @@ class Validator {
         this.warn("R14", `/sources/${i}/licence`, `licence "${id}" is not on the registry's attribution list; check whether it requires attribution`);
       }
     });
+  }
+
+  private rule16() {
+    if (!("laps" in this.c)) return;
+    const n = this.c.laps;
+    if (!Number.isInteger(n) || (n as number) < 1) this.err(16, "/laps", "laps must be an integer of 1 or more");
+    else if (!this.closed) this.err(16, "/laps", "laps is only allowed on a closed course");
+  }
+
+  private rule17() {
+    if (!("roadRules" in this.c)) return;
+    const r = this.c.roadRules;
+    if (!isObj(r)) return this.err(17, "/roadRules", "roadRules must be an object");
+    if (r.driveSide !== "left" && r.driveSide !== "right") this.err(17, "/roadRules/driveSide", 'roadRules.driveSide must be "left" or "right"');
+    const known = (kind: string) => roadStandards.entries.filter((e) => e.kind === kind).map((e) => e.id);
+    for (const [k, country] of [["signs", false], ["markings", true]] as const) {
+      if (!(k in r)) continue;
+      const v = r[k];
+      if (typeof v !== "string") { this.err(17, `/roadRules/${k}`, `roadRules.${k} must be a string`); continue; }
+      if (country && /^[A-Z]{2}$/.test(v)) continue;
+      if (VENDOR_VALUE.test(v)) continue;
+      if (!/^[a-z0-9_]+$/.test(v)) this.err(17, `/roadRules/${k}`, `roadRules.${k} "${v}" is not a registry id, vendor:name${country ? " or country code" : ""}`);
+      else if (!known(k).includes(v)) this.warn("R17", `/roadRules/${k}`, `roadRules.${k} "${v}" is not in the registry's road standards`);
+    }
   }
 
   /** Rule 15, then MUST and SHOULD text outside section 8, reported as warnings. */

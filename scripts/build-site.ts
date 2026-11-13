@@ -22,6 +22,7 @@ const read = (p: string) => readFileSync(join(root, p), "utf8");
 const SITE_PATH: Record<string, string> = {
   "README.md": "/",
   "spec/0.1/geocourse-0.1.md": "/spec/0.1/",
+  "spec/scenery-0.1/geocourse-scenery-0.1.md": "/spec/scenery-0.1/",
   "registry/README.md": "/registry/",
   "tests/0.1/README.md": "/tests/0.1/",
   "src/README.md": "/validator/",
@@ -114,6 +115,7 @@ page("/", "GeoCourse: a proposed open standard for cycling courses", render(read
 page("/spec/0.1/", "GeoCourse specification, draft 0.1", render(read("spec/0.1/geocourse-0.1.md"), "spec/0.1/geocourse-0.1.md"));
 copyFileSync(join(root, "spec/0.1/geocourse-0.1.md"), join(out, "spec/0.1/geocourse-0.1.md"));
 redirect("/spec/", "/spec/0.1/");
+page("/spec/scenery-0.1/", "GeoCourse Scenery, draft 0.1 (outline)", render(read("spec/scenery-0.1/geocourse-scenery-0.1.md"), "spec/scenery-0.1/geocourse-scenery-0.1.md"));
 
 // Schema.
 const schemaText = read("schema/0.1/geocourse.schema.json");
@@ -129,7 +131,7 @@ ${table(["Version", "$id", "Spec"], [["0.1", `<a href="${esc(schemaId)}">${esc(s
 
 // Registry.
 const reg = (f: string) => JSON.parse(read(`registry/${f}`));
-const types = reg("range-types.json"), kinds = reg("kinds.json"), exts = reg("extensions.json"), lic = reg("attribution-licences.json");
+const types = reg("range-types.json"), kinds = reg("kinds.json"), exts = reg("extensions.json"), lic = reg("attribution-licences.json"), roads = reg("road-standards.json");
 cpSync(join(root, "registry"), join(out, "registry"), { recursive: true, filter: (p) => !p.endsWith(".md") && !p.endsWith("LICENSE") });
 copyFileSync(join(root, "registry/LICENSE"), join(out, "registry/LICENSE.txt"));
 page("/registry/", "GeoCourse registry", `${render(read("registry/README.md"), "registry/README.md")}
@@ -140,6 +142,9 @@ ${table(["Range type", "kind", "OSM tags", "Since"], kinds.entries.map((e: { typ
 <h2 id="extensions">Extensions</h2>
 ${exts.entries.length ? table(["Name", "Vendor", "Description"], exts.entries.map((e: { name: string; vendor: string; description: string }) => [code(e.name), esc(e.vendor), esc(e.description)])) : "<p>None registered yet.</p>"}
 <p>Reserved vendor prefixes: ${exts.reserved.map(code).join(", ")}.</p>
+<h2 id="road-standards">Road standards</h2>
+<p>Values for <code>roadRules.signs</code> and <code>roadRules.markings</code> (spec 3). <code>markings</code> may also be an ISO 3166-1 alpha-2 country code.</p>
+${table(["Member", "id", "Standard", "Since"], roads.entries.map((e: { kind: string; id: string; name: string; since: string }) => [code(e.kind), code(e.id), esc(e.name), e.since]))}
 <h2 id="attribution-licences">Attribution licences</h2>
 <p>A source under one of these licences makes <code>attribution</code> required (rule 14): ${lic.requireAttribution.map(code).join(", ")}.</p>
 <p>No attribution needed: ${lic.noAttribution.map(code).join(", ")}. Any other licence id is reported as a warning.</p>`);

@@ -4,6 +4,12 @@ Spec, schema and validator versions. Dates are UTC.
 
 ## Unreleased
 
+- Spec 0.1, findings from Lake Volta (2026-11-13): optional `laps` on closed courses (rule 16); optional `roadRules` with `driveSide`, `signs` and `markings` (rule 17); section 7 shows wrong against right for extension names (`vendor_feature`) and extension types and kinds (`vendor:name`); section 10 moves scenery to a renderer-independent companion spec and says course extensions SHOULD NOT carry it beyond small hints.
+- Spec: GeoCourse Scenery 0.1 outline at `spec/scenery-0.1/` (scope only).
+- Schema 0.1: `laps`, `roadRules`.
+- Registry: `road-standards.json` (`vienna`, `mutcd`, `sadc`, `japan`, `australia` signs; `vienna`, `mutcd` markings).
+- Validator: rules 16 and 17; unknown road-standard ids are warnings.
+- Tests: valid stadium loop with laps and road rules; invalid laps on an open course, 0 laps, and a bad `driveSide`.
 - GeoCourse presented as a proposed open standard: status block on the home page and spec, process and path to 1.0 in Contributing, an Implementations list, and a /feedback/ link to issues.
 - Pending: Frost Gate Traverse added to `tests/0.1/valid/`.
 - Spec 0.1 re-converted from doc rev 58: bend window clamped at the ends of an open course and wrapping on a loop, S-bends split where the direction changes, rule 9 windows defined, headings that round to 360° stored as 0, no finish marker on a closed course (rule 15, rev 59), `widthSource` `"design"`, drafts may change until released.

@@ -7,13 +7,14 @@ The registry lists the names GeoCourse files use, so names never collide (spec 7
 | [`range-types.json`](range-types.json) | Range types (spec 5) |
 | [`kinds.json`](kinds.json) | `kind` values for `structure`, `hazard` and `marker` (spec 5.7 to 5.9) |
 | [`extensions.json`](extensions.json) | Extension names and vendor prefixes (spec 7) |
+| [`road-standards.json`](road-standards.json) | Sign and marking standard ids for `roadRules` (spec 3) |
 | [`attribution-licences.json`](attribution-licences.json) | SPDX licence ids that make `attribution` required (rule 14) |
 
 ## Naming
 
 - Core range types and `kind` values are lowercase, with no prefix. Only the spec adds them.
 - Extension range types and `kind` values are `vendor:name`, for example `acme:checkpoint`.
-- Extension names are `vendor_feature`, for example `acme_scenery`.
+- Extension names are `vendor_feature`, for example `acme_scenery`. Never `acme:scenery`: the colon form is only for range types and `kind` values.
 - `vendor` is your organisation or project, lowercase letters and digits. The vendor `acme` is reserved for examples and test files.
 
 ## Request a name
