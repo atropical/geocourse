@@ -8,6 +8,8 @@
 
 GeoCourse Scenery describes what is around a course, so any app can build its own world for it. It is to a renderer what OpenStreetMap data is to a map style: it says what is where, never how it looks. A course file stays rideable without it; scenery never changes how a course rides.
 
+Scenery data only says what is where. Every app is free to draw, model, level and stream it however it wants, and a reader MAY ignore it entirely. There is no conformance requirement on rendering: conformance covers reading the data, never how it looks.
+
 ## Linking to a course
 
 A scenery file names the course it fits by `id` and `version`, and carries its own version. Changing scenery never changes the course `version`; a new course `version` may need a new scenery file.
